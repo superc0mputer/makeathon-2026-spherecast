@@ -16,6 +16,8 @@ This pipeline automates the process of finding viable, cost-effective, and low-r
 
 * **Step 1: Product Clustering**
     Group similar products and product families to understand the broader context of how this ingredient is used.
+![alt text](image.png)
+
 * **Step 2: Chemical Component Extraction**
     Query the **PubChem API** to break down the target ingredient into its base chemical components. 
 
@@ -26,6 +28,8 @@ This pipeline automates the process of finding viable, cost-effective, and low-r
     Send the chemical components to an LLM. Ask: *"Can these components actually act as a substitute in this specific context?"* * **Prompt Context Provided:** The clustered similar products AND all other current ingredients in our product's BOM (to avoid negative chemical reactions or flavor profile clashes).
 * **Step 4: Shortlisting**
     The LLM outputs a curated list of possible substitutions, each tagged with a **Confidence Score** (e.g., 0-100%).
+
+    ![alt text](image-1.png)
 
 ### Phase 3: Logistics & Sourcing Enrichment
 *The goal here is to attach real-world business data (price, supplier, distance) to our shortlisted substitutes.*
