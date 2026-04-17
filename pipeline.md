@@ -5,7 +5,7 @@
 **Overview**
 This pipeline automates the process of finding viable, cost-effective, and low-risk substitute ingredients for our manufacturing process. It leverages chemical databases, supplier logistics, and LLM-driven analysis to recommend the best alternatives.
 
-* **Inputs:** BOM-Ingredient (Target for substitution), Company Location.
+* **Inputs:** BOM-Ingredient (Target for substitution), Company Location, Customer Preferences (Weights for LLM, specified in UI).
 * **Ultimate Goal:** Identify the best chemical/ingredient substitutes and the optimal suppliers to source them from.
 * **Final Output:** A clean UI displaying the **Top 3** recommended substitutes and their respective suppliers.
 
