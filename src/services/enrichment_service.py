@@ -3,7 +3,7 @@ import os
 import sqlite3
 import urllib.request
 import urllib.parse
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from src.models.supplier_record import SupplierRecord
 from src.services.geocoding_service import NominatimGeocoder, enrich_suppliers_with_geodata
 
