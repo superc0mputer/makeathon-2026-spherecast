@@ -3,7 +3,7 @@ import json
 import os
 from datetime import datetime, timedelta
 
-CACHE_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "cache.sqlite")
+CACHE_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "db/cache.sqlite")
 
 def _get_connection():
     con = sqlite3.connect(CACHE_DB_PATH)

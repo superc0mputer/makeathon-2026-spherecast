@@ -9,7 +9,7 @@ from src.services.nominatim_service import NominatimGeocoder, enrich_suppliers_w
 from src.api_clients.mintec_client import MintecClient
 
 class SupplyChainEnricher:
-    def __init__(self, db_path: str = "db.sqlite", mintec_api_url: str = "http://127.0.0.1:8000/api/v1/prices"):
+    def __init__(self, db_path: str = "db/db.sqlite", mintec_api_url: str = "http://127.0.0.1:8000/api/v1/prices"):
         base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         self.db_path = os.path.join(base_path, db_path)
         self.mintec_api_url = mintec_api_url

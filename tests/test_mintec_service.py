@@ -31,7 +31,7 @@ def test_supply_chain_enrichment(mock_urlopen):
         llm_response = json.load(f)
         
     # 2. Instantiate the enricher
-    enricher = SupplyChainEnricher(db_path="db.sqlite")
+    enricher = SupplyChainEnricher(db_path="db/db.sqlite")
     
     # 3. Enrich the data with Supplier and Price info
     enriched_data = enricher.enrich_substitutes(llm_response)

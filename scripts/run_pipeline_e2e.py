@@ -37,7 +37,7 @@ def main():
     
     # Properly construct path to db.sqlite in the project root
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    db_path = os.path.join(base_path, "db.sqlite")
+    db_path = os.path.join(base_path, "db/db.sqlite")
     
     # Inputs mimicking frontend UI parameters
     target_sku = "RM-C14-b-vitamins-6b1105ff" 

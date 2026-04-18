@@ -26,7 +26,7 @@ from src.services.supplier_db_service import ingredient_name_from_sku
 from src.services.fdc_service import FDCService
 from src.services.pubchem_service import enrich_ingredient
 
-DEFAULT_DB = "db.sqlite"
+DEFAULT_DB = "db/db.sqlite"
 MIN_SIMILARITY = 0.40
 
 

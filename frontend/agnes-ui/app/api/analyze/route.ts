@@ -8,7 +8,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const repoRoot = path.resolve(process.cwd(), '..', '..')
-const dbPath = path.join(repoRoot, 'db.sqlite')
+const dbPath = path.join(repoRoot, 'db/db.sqlite')
 const venvPython = path.join(repoRoot, '.venv', 'bin', 'python')
 const pythonBinary = fs.existsSync(venvPython) ? venvPython : 'python3'
 
@@ -293,7 +293,7 @@ for item in substitution_result.get("substitutes", []):
         "hybrid_similarity": item.get("hybrid_similarity", cluster_match["similarity_score"] if cluster_match else None),
     })
 
-enricher = SupplyChainEnricher(db_path="db.sqlite")
+enricher = SupplyChainEnricher(db_path="db/db.sqlite")
 enriched = enricher.enrich_substitutes({"substitutes": resolved_substitutes}, company_coords=COMPANY_COORDS)
 enriched_substitutes = enriched.get("substitutes", [])
 
