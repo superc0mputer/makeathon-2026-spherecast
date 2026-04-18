@@ -1,0 +1,612 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #111827;
+}
+
+.pageShell {
+  min-height: 100vh;
+  padding: 40px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(180deg, #070d1a 0%, #03070f 72%, #061127 100%);
+}
+
+.pageShell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    radial-gradient(1px 1px at 8% 16%, rgba(157, 198, 255, 0.55) 50%, transparent 51%),
+    radial-gradient(1px 1px at 14% 34%, rgba(157, 198, 255, 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 20% 24%, rgba(157, 198, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 26% 43%, rgba(157, 198, 255, 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 34% 29%, rgba(157, 198, 255, 0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 40% 18%, rgba(157, 198, 255, 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 48% 33%, rgba(157, 198, 255, 0.55) 50%, transparent 51%),
+    radial-gradient(1px 1px at 56% 22%, rgba(157, 198, 255, 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 64% 36%, rgba(157, 198, 255, 0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 72% 16%, rgba(157, 198, 255, 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 82% 27%, rgba(157, 198, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 90% 38%, rgba(157, 198, 255, 0.35) 50%, transparent 51%);
+}
+
+.pageShell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 71% 31%, rgba(141, 213, 255, 0.72), rgba(141, 213, 255, 0) 19%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 69%, rgba(129, 216, 255, 0.6) 71%, rgba(0, 0, 0, 0) 73%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 66%, rgba(129, 216, 255, 0.55) 68%, rgba(0, 0, 0, 0) 70%);
+}
+
+.dashboard {
+  width: min(1400px, calc(100vw - 80px));
+  min-height: 720px;
+  background: linear-gradient(165deg, #f8fbff 0%, #eff4ff 100%);
+  border: 1px solid #c9d8f8;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 20px 48px rgba(2, 8, 20, 0.36);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #d8e4fc;
+}
+
+.brandWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brandDot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #5ea3ff;
+  box-shadow: 0 0 14px rgba(94, 163, 255, 0.7);
+}
+
+.brandText {
+  font-weight: 700;
+  font-size: 1.28rem;
+  letter-spacing: 0.01em;
+}
+
+.navLinks {
+  display: flex;
+  gap: 18px;
+  color: #5f708f;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.loginBtn,
+.ghostBtn {
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.loginBtn {
+  background: transparent;
+  color: #475569;
+  border: 1px solid transparent;
+}
+
+.ghostBtn {
+  border: 1px solid #9bb9ec;
+  background: #ffffff;
+  color: #21314f;
+}
+
+.hero {
+  padding: 26px 0 18px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 3rem;
+  line-height: 0.98;
+  color: #253d8e;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  margin: 8px 0 0;
+  color: #34496f;
+  font-weight: 600;
+  font-size: 1.45rem;
+}
+
+.statGrid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+
+.statCard {
+  background: #ffffff;
+  border: 1px solid #d8e4fc;
+  border-radius: 11px;
+  padding: 14px;
+  display: grid;
+  gap: 3px;
+}
+
+.statCard strong {
+  color: #0f172a;
+  font-size: 1.35rem;
+}
+
+.statCard small {
+  color: #61728f;
+  font-size: 0.86rem;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 14px;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #d8e4fc;
+  border-radius: 11px;
+  padding: 18px;
+}
+
+.leftPanel h2,
+.rightPanel h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.95rem;
+  letter-spacing: -0.01em;
+}
+
+.muted {
+  margin: 8px 0 18px;
+  color: #61728f;
+  font-size: 1.04rem;
+}
+
+.fieldLabel {
+  display: block;
+  margin: 0 0 8px;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 1.02rem;
+}
+
+.textInput {
+  width: 100%;
+  border: 1px solid #c8d8f6;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 16px;
+  font-size: 1.05rem;
+}
+
+.priorityGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.priorityCard {
+  border: 1px solid #c8d8f6;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+}
+
+.priorityCard strong {
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.priorityCard small {
+  color: #61728f;
+  font-size: 0.86rem;
+}
+
+.priorityCard.active {
+  border-color: #7cadf8;
+  background: #eef5ff;
+}
+
+.ingredientValue {
+  margin: 10px 0 12px;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 1.15rem;
+  min-height: 26px;
+}
+
+.miniBlock {
+  padding: 11px;
+  border: 1px solid #d8e4fc;
+  border-radius: 10px;
+  background: #f8fbff;
+  margin-top: 10px;
+  display: grid;
+  gap: 3px;
+}
+
+.miniBlock span {
+  color: #61728f;
+  font-size: 0.84rem;
+}
+
+.miniBlock strong {
+  color: #0f172a;
+  font-size: 1.04rem;
+}
+
+.runSection {
+  margin-top: 12px;
+}
+
+.runBtn {
+  width: 100%;
+  border: 1px solid #88aef2;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #2f65d9 0%, #1f4fbd 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 11px 14px;
+  cursor: pointer;
+}
+
+.runStatus {
+  margin: 8px 0 0;
+  font-size: 0.86rem;
+  color: #61728f;
+}
+
+.resultsDashboard {
+  min-height: auto;
+}
+
+.resultsHero {
+  padding: 18px 0 8px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.resultsHero h1 {
+  margin: 0;
+  font-size: 3rem;
+  line-height: 0.98;
+  color: #253d8e;
+}
+
+.resultsHero p {
+  margin: 8px 0;
+  color: #34496f;
+  font-weight: 600;
+  font-size: 1.45rem;
+}
+
+.backLink {
+  color: #3a5fc8;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.heroActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.badge {
+  padding: 9px 12px;
+  border: 1px solid #d8e4fc;
+  border-radius: 999px;
+  background: #f5f8ff;
+  color: #5d7090;
+  font-size: 0.85rem;
+}
+
+.resultsTitle {
+  margin: 10px 0 12px;
+  color: #111a2d;
+  font-size: 2rem;
+}
+
+.resultsTitle span {
+  color: #345ac9;
+}
+
+.kpiRow {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.resultsGrid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr);
+  align-items: start;
+}
+
+.tablePanel h3 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 1.9rem;
+}
+
+.altTableWrap {
+  max-height: 760px;
+  overflow: auto;
+  border: 1px solid #e2eafb;
+  border-radius: 10px;
+}
+
+.altTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.altTable th,
+.altTable td {
+  border-top: 1px solid #e6ecf9;
+  padding: 10px 8px;
+  text-align: left;
+  font-size: 0.9rem;
+  color: #2e3e5e;
+}
+
+.altTable th {
+  color: #647796;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.altTable tbody tr {
+  cursor: pointer;
+}
+
+.altTable tbody tr:hover {
+  background: #f8fbff;
+}
+
+.altRowSelected {
+  background: #eef4ff;
+}
+
+.altCell {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.altCell strong {
+  display: block;
+  color: #19253f;
+}
+
+.altCell small {
+  color: #6f809d;
+  font-size: 0.8rem;
+}
+
+.rank {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #e7efff;
+  color: #345ac9;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.score {
+  display: inline-block;
+  min-width: 34px;
+  text-align: center;
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.score.good {
+  background: #dff2df;
+  color: #2a7a41;
+}
+
+.score.warn {
+  background: #f8ebcf;
+  color: #a56e16;
+}
+
+.impact {
+  color: #2e8b57 !important;
+  font-weight: 700;
+}
+
+.tableFooter {
+  margin: 10px 0 0;
+  text-align: center;
+  color: #5f7291;
+  font-weight: 600;
+}
+
+.resultsSide {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid #e2eafb;
+  color: #516483;
+}
+
+.summaryRow strong {
+  color: #16223c;
+}
+
+.reasoningList {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.reasoningList li {
+  position: relative;
+  padding: 10px 12px 10px 30px;
+  border: 1px solid #dbe6fb;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f5f9ff 100%);
+  color: #4a5c7d;
+  line-height: 1.4;
+  font-size: 0.9rem;
+}
+
+.reasoningList li::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 15px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4c7ae0;
+  box-shadow: 0 0 0 3px rgba(76, 122, 224, 0.15);
+}
+
+.reasoningList strong {
+  color: #1d2d4d;
+}
+
+@media (max-width: 1200px) {
+  .dashboard {
+    min-height: auto;
+  }
+
+  .navLinks {
+    gap: 12px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 980px) {
+  .statGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .kpiRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resultsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resultsHero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .heroActions {
+    flex-wrap: wrap;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero p {
+    font-size: 1.15rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .pageShell {
+    padding: 16px;
+  }
+
+  .dashboard {
+    width: min(1400px, calc(100vw - 32px));
+    padding: 16px;
+  }
+
+  .navLinks,
+  .loginBtn {
+    display: none;
+  }
+
+  .statGrid,
+  .priorityGrid,
+  .kpiRow {
+    grid-template-columns: 1fr;
+  }
+
+  .brandText {
+    font-size: 1.02rem;
+  }
+
+  .hero h1 {
+    font-size: 1.85rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+}
