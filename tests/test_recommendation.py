@@ -7,6 +7,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.services.llm_service import IngredientLLMClient
+from src.models.logistics_context import LogisticsContext, SourcedMaterial, SupplierDetails
 
 @pytest.fixture
 def mock_enriched_data():
@@ -90,13 +91,27 @@ def test_recommendation_engine(mock_client_class, mock_enriched_data):
         "price": "Medium Priority"
     }
     
-    response = client.get_top_3_recommendations(
+    sourced_materials = []
+    for sub in mock_enriched_data["substitutes"]:
+        sups = [SupplierDetails(**s) for s in sub["suppliers"]]
+        sm = SourcedMaterial(
+            substitute_name=sub["substitute_name"],
+            confidence_score=sub["confidence_score"],
+            reasoning=sub["reasoning"],
+            price_per_kg=sub["price_per_kg"],
+            suppliers=sups
+        )
+        sourced_materials.append(sm)
+
+    context = LogisticsContext(
         target_ingredient=target,
         bom_ingredients=bom,
-        company_coords=coords,
+        company_coords=list(coords),
         preference_weights=preferences,
-        enriched_data=mock_enriched_data
+        candidates=sourced_materials
     )
+
+    response = client.get_top_3_recommendations(context=context)
     
     # 4. Assert Pydantic Structure returned perfectly
     assert "top_3_recommendations" in response

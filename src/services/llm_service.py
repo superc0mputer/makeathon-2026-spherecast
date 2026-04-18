@@ -4,7 +4,8 @@ import json
 from pydantic import BaseModel
 
 from src.models.recommendation_record import FinalDecisionResponse
-from src.models.phase2_context import Phase2Context
+from src.models.biochemical_context import BiochemicalContext
+from src.models.logistics_context import LogisticsContext
 from src.api_clients.gemini_client import GeminiClient
 
 class SubstituteItem(BaseModel):
@@ -29,7 +30,7 @@ class IngredientLLMClient:
         with open(full_path, "r", encoding="utf-8") as f:
             return f.read()
 
-    def get_substitutes(self, context: Phase2Context) -> Dict[str, Any]:
+    def get_substitutes(self, context: BiochemicalContext) -> Dict[str, Any]:
         """
         Injects real values into the prompt template and calls Gemini,
         asserting the output is strict JSON. Evaluates against Chemical Profiles and overall BOM interactions.
@@ -62,30 +63,29 @@ class IngredientLLMClient:
 
     def get_top_3_recommendations(
         self,
-        target_ingredient: str,
-        bom_ingredients: List[str],
-        company_coords: tuple[float, float],
-        preference_weights: Dict[str, str],
-        enriched_data: Dict[str, Any]
+        context: LogisticsContext
     ) -> Dict[str, Any]:
         """
         Executes Step 8 (Phase 4): The Decision Engine.
         Uses the Gemini model to evaluate fully enriched JSON metrics (dist, price, confidence) 
-        and strict returns the final Top 3 combinations.
+        and strictly returns the final Top 3 combinations based purely on Logistics and Supply Chain Optimization.
         """
         template = self.load_prompt_template("prompts/recommendation_v1.prompt.txt")
         
-        prompt = template.replace("{{target_ingredient}}", target_ingredient)
-        prompt = prompt.replace("{{bom_ingredients}}", ", ".join(bom_ingredients))
-        prompt = prompt.replace("{{company_coords}}", f"{company_coords[0]}, {company_coords[1]}")
-        prompt = prompt.replace("{{preference_weights}}", json.dumps(preference_weights))
-        prompt = prompt.replace("{{enriched_data}}", json.dumps(enriched_data, indent=2))
+        prompt = template.replace("{{target_ingredient}}", context.target_ingredient)
+        prompt = prompt.replace("{{company_coords}}", f"{context.company_coords[0]}, {context.company_coords[1]}")
+        prompt = prompt.replace("{{bom_ingredients}}", json.dumps(context.bom_ingredients))
+        prompt = prompt.replace("{{preference_weights}}", json.dumps(context.preference_weights))
+        
+        # Serialize the validated Pydantic substitutes directly into the prompt
+        sub_dump = [sub.model_dump() for sub in context.candidates]
+        prompt = prompt.replace("{{substitutes}}", json.dumps(sub_dump, indent=2))
         
         try:
             raw_response = self.client.generate_json_structured_content(
                 prompt=prompt,
                 response_schema=FinalDecisionResponse,
-                system_instruction="You are a strict Data Scientist ranking supply chain constraints.",
+                system_instruction="You are a strict Data Scientist ranking supply chain constraints. Never evaluate chemistry.",
                 temperature=0.2
             )
             return json.loads(raw_response)

@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Dict
 from src.models.substitution.full_ingredient_profile import FullIngredientProfile
 
-class Phase2Context(BaseModel):
+class BiochemicalContext(BaseModel):
     """
     The strictly typed data model injected into the Phase 2 LLM Prompt to determine
     viable ingredient substitutions based on the whole formula context.

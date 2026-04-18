@@ -20,7 +20,8 @@ from src.services.llm_service import IngredientLLMClient
 from src.services.mintec_service import SupplyChainEnricher
 from src.services.fdc_service import fetch_fdc_profiles
 from src.models.substitution.nutritional_profile import NutritionalProfile
-from src.models.phase2_context import Phase2Context
+from src.models.logistics_context import LogisticsContext, SourcedMaterial, SupplierDetails
+from src.models.biochemical_context import BiochemicalContext
 from src.models.substitution.full_ingredient_profile import FullIngredientProfile
 
 def main():
@@ -90,7 +91,7 @@ def main():
     print("✅ Full Context Profiles Retrieved.")
 
     # Instantiate the formal Pydantic payload
-    phase2_context = Phase2Context(
+    biochemical_context = BiochemicalContext(
         target_ingredient=target_name,
         product_cluster="Vitamins & Minerals",
         target_profile=target_profile,
@@ -102,7 +103,7 @@ def main():
     
     if api_key or vertex_project:
         llm_client = IngredientLLMClient(api_key=api_key, project_id=vertex_project, location=vertex_location)
-        llm_shortlist = llm_client.get_substitutes(phase2_context)
+        llm_shortlist = llm_client.get_substitutes(biochemical_context)
     else:
         llm_shortlist = {"error": "GEMINI_API_KEY or VERTEX_PROJECT_ID environment variable not set. Using mock LLM client."}
     
@@ -141,16 +142,46 @@ def main():
     # ---------------------------------------------------------
     # PHASE 4: The Decision Engine
     # ---------------------------------------------------------
-    print("\n[Phase 4] LLM Multi-Criteria Decision Engine (Evaluating Price/Distance/Chemicals)...")
+    print("\n[Phase 4] LLM Multi-Criteria Decision Engine (Evaluating Price/Distance)...")
     
-    if api_key or vertex_project:
-        final_recs = llm_client.get_top_3_recommendations(
+    # Strictly Type the contextual mapping
+    try:
+        sourced_materials = []
+        for sub in enriched_data.get('substitutes', []):
+            supplier_details = []
+            for sup in sub.get('suppliers', []):
+                supplier_details.append(SupplierDetails(
+                    supplier_id=sup.get('supplier_id', 0),
+                    name=sup.get('name', 'Unknown'),
+                    match_confidence=sup.get('match_confidence'),
+                    lat=sup.get('lat'),
+                    lng=sup.get('lng'),
+                    distance_km=sup.get('distance_km'),
+                    stocked_ingredients=sup.get('stocked_ingredients', []),
+                ))
+                
+            en_sub = SourcedMaterial(
+                substitute_name=sub.get('substitute_name', 'Unknown'),
+                confidence_score=sub.get('confidence_score', 0),
+                reasoning=sub.get('reasoning', ''),
+                price_per_kg=sub.get('price_per_kg'),
+                suppliers=supplier_details
+            )
+            sourced_materials.append(en_sub)
+
+        logistics_context = LogisticsContext(
             target_ingredient=target_name,
+            company_coords=list(company_coords),
             bom_ingredients=bom_ingredients,
-            company_coords=company_coords,
             preference_weights=preference_weights,
-            enriched_data=enriched_data
+            candidates=sourced_materials
         )
+    except Exception as e:
+        print(f"❌ Failed to construct strictly typed Phase 4 Payload: {e}")
+        return
+        
+    if api_key or vertex_project:
+        final_recs = llm_client.get_top_3_recommendations(context=logistics_context)
     else:
         final_recs = {"error": "GEMINI_API_KEY or VERTEX_PROJECT_ID environment variable not set. Cannot run final LLM step."}
     
