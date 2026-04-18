@@ -1,0 +1,54 @@
+{
+  "target_sku": "RM-C14-b-vitamins-6b1105ff",
+  "total_viable_substitutes": 12,
+  "substitutes": [
+    {
+      "sku": "RM-C14-thiamine-904ca673",
+      "similarity_score": 0.5879
+    },
+    {
+      "sku": "RM-C14-riboflavin-cca38c81",
+      "similarity_score": 0.5879
+    },
+    {
+      "sku": "RM-C14-biotin-b128e9e7",
+      "similarity_score": 0.5701
+    },
+    {
+      "sku": "RM-C14-copper-0315914d",
+      "similarity_score": 0.5701
+    },
+    {
+      "sku": "RM-C14-lycopene-92d0ad75",
+      "similarity_score": 0.5701
+    },
+    {
+      "sku": "RM-C14-manganese-c9e87173",
+      "similarity_score": 0.5701
+    },
+    {
+      "sku": "RM-C14-niacinamide-603dda4f",
+      "similarity_score": 0.5701
+    },
+    {
+      "sku": "RM-C14-lutein-c82b0e46",
+      "similarity_score": 0.5701
+    },
+    {
+      "sku": "RM-C14-folate-65ea52b0",
+      "similarity_score": 0.5701
+    },
+    {
+      "sku": "RM-C14-pantothenic-acid-9e8a871d",
+      "similarity_score": 0.5701
+    },
+    {
+      "sku": "RM-C14-vitamin-b12-296cc7e3",
+      "similarity_score": 0.5701
+    },
+    {
+      "sku": "RM-C14-vitamin-b6-c130b713",
+      "similarity_score": 0.5701
+    }
+  ]
+}
