@@ -71,7 +71,7 @@ def calculate_target_substitutes(components: pd.DataFrame, target_sku: str) -> d
     target_idx = np.where(ingredient_skus == target_sku)[0][0]
 
     # BOM Similarities
-    tfidf = TfidfTransformer(norm=None)
+    tfidf = TfidfTransformer(norm='l2')
     bom_matrix = tfidf.fit_transform(binary_bom_matrix).toarray()
     co_occurrence = np.dot(bom_matrix.T, bom_matrix)
     np.fill_diagonal(co_occurrence, 0)
@@ -97,7 +97,10 @@ def calculate_target_substitutes(components: pd.DataFrame, target_sku: str) -> d
     
     names_mapped = [ingredient_name_from_sku(sku) for sku in ingredient_skus]
     
-    for name in names_mapped:
+    for i, name in enumerate(names_mapped):
+        if i % 25 == 0 or i == len(names_mapped) - 1:
+            print(f"        ...fetching profile {i+1}/{len(names_mapped)}: {name} (can be slow without cache)")
+            
         # PubChem
         profile = enrich_ingredient(name)
         chem_vec = [

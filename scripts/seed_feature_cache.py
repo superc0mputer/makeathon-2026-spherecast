@@ -14,6 +14,10 @@ from src.services.supplier_db_service import ingredient_name_from_sku
 def main():
     load_dotenv()
     
+    parser = argparse.ArgumentParser(description="Pre-warm cache for USDA nutrition data and PubChem.")
+    parser.add_argument("--max-age", type=int, default=30, help="Max age in days before refetching (default: 30)")
+    args = parser.parse_args()
+
     print("=====================================================")
     print("🌱 SMART INGREDIENT SUBSTITUTION - CACHE SEEDER")
     print("=====================================================")
@@ -44,7 +48,7 @@ def main():
     fdc_api_key = os.environ.get("FDC_API_KEY")
     fdc_service = FDCService(api_key=fdc_api_key)
 
-    print("\nStarting seed process. This may take a while depending on API rate limits...")
+    print(f"\nStarting seed process checking cache max age of {args.max_age} days. This may take a while depending on API rate limits...")
     
     success_count = 0
     for i, name in enumerate(materials):
@@ -53,8 +57,8 @@ def main():
         # 1. PubChem Cache Check/Fetch
         print(f"  -> PubChem... ", end="", flush=True)
         try:
-            # enrich_ingredient already implements read-through caching!
-            profile = enrich_ingredient(name, rate_limit=True)
+            # Note: enrich_ingredient needs to support max_age_days
+            profile = enrich_ingredient(name, rate_limit=True, max_age_days=args.max_age)
             print(f"Status: {profile.status.value if hasattr(profile.status, 'value') else profile.status}")
         except Exception as e:
             print(f"Error: {e}")
@@ -62,8 +66,7 @@ def main():
         # 2. FDC Cache Check/Fetch
         print(f"  -> FoodData Central... ", end="", flush=True)
         try:
-            # get_nutritional_profile implements read-through caching!
-            fdc_result = fdc_service.get_nutritional_profile(name)
+            fdc_result = fdc_service.get_nutritional_profile(name, max_age_days=args.max_age)
             print(f"Status: {fdc_result.get('status')}")
         except Exception as e:
             print(f"Error: {e}")

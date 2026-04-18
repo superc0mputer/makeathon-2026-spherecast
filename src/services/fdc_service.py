@@ -8,12 +8,12 @@ class FDCService:
         self.api_key = api_key or "DEMO_KEY"
         self.base_url = "https://api.nal.usda.gov/fdc/v1"
 
-    def get_nutritional_profile(self, ingredient_name: str) -> Dict[str, Any]:
+    def get_nutritional_profile(self, ingredient_name: str, max_age_days: int = None) -> Dict[str, Any]:
         """
         Search FoodData Central for an ingredient and return a simplified nutritional profile.
         Checks local SQLite cache first.
         """
-        cached_data = get_fdc(ingredient_name)
+        cached_data = get_fdc(ingredient_name, max_age_days=max_age_days)
         if cached_data:
             return cached_data
 
@@ -31,7 +31,9 @@ class FDCService:
             data = response.json()
             
             if not data.get("foods"):
-                return {"status": "not_found", "message": f"No FDC data found for {ingredient_name}"}
+                result = {"status": "not_found", "message": f"No FDC data found for {ingredient_name}"}
+                set_fdc(ingredient_name, result)
+                return result
             
             food_item = data["foods"][0]
             nutrients = food_item.get("foodNutrients", [])
@@ -59,7 +61,12 @@ class FDCService:
             return result
             
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            result = {"status": "error", "message": str(e)}
+            # If it's a 400 client error (like 404), cache it so we don't spam the API
+            if isinstance(e, requests.exceptions.HTTPError) and 400 <= e.response.status_code < 500:
+                result["status"] = "not_found"
+                set_fdc(ingredient_name, result)
+            return result
 
 def fetch_fdc_profiles(target: str, candidates: List[str], api_key: str = None) -> Dict[str, Any]:
     """Helper to fetch target and candidate profiles in one go for the LLM."""

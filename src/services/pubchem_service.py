@@ -247,6 +247,7 @@ def _error_profile(query_name: str, detail: str) -> ChemicalProfile:
 def enrich_ingredient(
         ingredient_name: str,
         rate_limit: bool = True,
+        max_age_days: int = None,
 ) -> ChemicalProfile:
     """
     Query PubChem for a single ingredient name and return a ChemicalProfile.
@@ -259,7 +260,7 @@ def enrich_ingredient(
         ChemicalProfile with status set to RESOLVED, NOT_FOUND, or API_ERROR
     """
     # Check cache first
-    cached_data = get_pubchem(ingredient_name)
+    cached_data = get_pubchem(ingredient_name, max_age_days=max_age_days)
     if cached_data:
         # Convert string back to ResolutionStatus enum
         if "status" in cached_data and isinstance(cached_data["status"], str):

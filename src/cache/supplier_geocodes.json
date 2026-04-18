@@ -8,6 +8,15 @@
     "matched_name": "Ashland County",
     "resolved_address": "Ashland County, Ohio, United States"
   },
+  "balchem": {
+    "google_place_id": null,
+    "lat": 45.6242695,
+    "lng": 8.6598867,
+    "match_confidence": "high",
+    "match_method": "name_only",
+    "matched_name": "Balchem",
+    "resolved_address": "Balchem, Marano Ticino, Novara, Piemonte, Italia"
+  },
   "colorcon": {
     "google_place_id": null,
     "lat": 39.7968612,
