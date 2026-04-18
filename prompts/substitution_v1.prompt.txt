@@ -6,22 +6,24 @@ IMPORTANT: You must ONLY evaluate and select from the "Candidate Substitutes" pr
 CONTEXT PROVIDED:
 - Target Ingredient: The ingredient we need to replace.
 - BOM (Bill of Materials) Ingredients: All other existing ingredients in our product's formula.
-- PubChem Components: The core chemical components and properties of the target ingredient and other ingredients in our product's formula. (derived via PubChem API).
-- Candidate Substitutes: A list of chemically similar ingredients provided by our database clustering and their core chemical components (derived via PubChem API).
+- Target Profile: The exact chemical (PubChem) and nutritional (FDC) footprint of the target ingredient to be replaced.
+- Candidate Profiles: The chemical (PubChem) and nutritional (FDC) footprints of the substitute candidates.
+- BOM Profiles: The chemical and nutritional footprints of the OTHER ingredients already present in the formula.
 
 EVALUATION CRITERIA:
-1. Chemical Similarity: The substitute must realistically replace the structural, textural, or flavor function of the target.
-2. BOM Incompatibilities: The substitute MUST NOT react negatively or conflict with other ingredients in the provided BOM. 
-3. Strict Filtering: If a candidate from the list is NOT a viable substitute, you must EXCLUDE it from the final list. Only return the candidates that actually work. 
-4. Class vs. Component Constraint: Do not suggest an isolated component (e.g., Vitamin B1) as a substitute for a complex or blend (e.g., B-Vitamin Complex or B Vitamins). Substitutes must offer the identical broad-spectrum nutritional function.
-5. Empty Results: If NONE of the candidates are viable, return an empty array for "substitutes". Do not force a match.
+1. Chemical Similarity: The substitute must realistically replace the structural, textural, or flavor function of the target. Compare their pubchem components (molecular weight, charge, salts).
+2. Whole-Formula Compatibility (BOM Incompatibilities): The substitute MUST NOT react negatively or conflict with other ingredients in the provided BOM. You must explicitly evaluate how the candidate interacts with the BOM ingredients in comparison to how the target ingredient interacts. Pay attention to pH clashes, unwanted precipitation, ionic charge states, and flavor masking.
+3. Nutritional Equivalence: Ensure the macro/micronutrient (FDC) footprint is not wildly skewed against the original target. 
+4. Strict Filtering: If a candidate from the list is NOT a viable substitute (due to chemical mismatch or a bad interaction with the BOM), you must EXCLUDE it from the final list. Only return the candidates that actually work. 
+5. Class vs. Component Constraint: Do not suggest an isolated component (e.g., Vitamin B1) as a substitute for a complex or blend (e.g., B-Vitamin Complex).
+6. Empty Results: If NONE of the candidates are viable, return an empty array for "substitutes". Do not force a match.
 
 ### INPUTS ###
 - Target Ingredient: {{target_ingredient}}
 - Product Cluster: {{product_cluster}}
-- BOM Ingredients: {{bom_ingredients}}
-- PubChem Components: {{pubchem_components}}
-- Candidate Substitutes: {{candidate_substitutes}}
+- Target Profile: {{target_profile}}
+- Candidate Profiles: {{candidate_profiles}}
+- BOM Profiles: {{bom_profiles}}
 
 ### REQUIRED OUTPUT ###
 You must respond with ONLY a valid, strict JSON object. Do not include markdown formatting (like ```json), conversational text, or explanations outside the JSON. The JSON must follow this exact schema:
@@ -31,7 +33,7 @@ You must respond with ONLY a valid, strict JSON object. Do not include markdown 
     {
       "substitute_name": "Organic Pea Protein Isolate",
       "confidence_score": 94,
-      "reasoning": "Explicitly reference interactions with BOM Ingredients and justify why this specific candidate is viable here."
+      "reasoning": "Explicitly reference interactions with BOM Ingredients, justifying why this candidate acts similarly to the target without causing negative cross-reactions with other compounds in the formula."
     }
   ]
 }

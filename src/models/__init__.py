@@ -1,4 +1,4 @@
-from src.models.chemical_profile import ChemicalProfile, ResolutionStatus
+from src.models.substitution.chemical_profile import ChemicalProfile, ResolutionStatus
 from src.models.supplier_record import MatchConfidence, MatchMethod, SupplierRecord, SupplierRecordDict
 
 __all__ = [
