@@ -1,9 +1,9 @@
 # makeathon-2026-spherecast
 
 # 🔄 Smart Ingredient Substitution Pipeline & UI
-
+> **Built for the Spherecast Challenge at the TUM.ai Makeathon 2026 🚀**
 **Overview**
-This pipeline automates the process of finding viable, cost-effective, and low-risk substitute ingredients for our manufacturing process. It leverages chemical databases, supplier logistics, and LLM-driven analysis to recommend the best alternatives.
+This pipeline automates the process of finding viable, cost-effective, and low-risk substitute ingredients for a manufacturing process of a company. It leverages chemical databases, supplier logistics, and LLM-driven analysis to recommend the best alternatives.
 
 * **Inputs:** BOM-Ingredient (Target for substitution), Company Location, Customer Preferences (Weights for LLM, specified in UI).
 * **Ultimate Goal:** Identify the best chemical/ingredient substitutes and the optimal suppliers to source them from.
@@ -62,57 +62,35 @@ This pipeline automates the process of finding viable, cost-effective, and low-r
 
 ---
 
-## 🛠 Setup & Installation
+## 🐳 Setup & Running with Docker
 
-Below are the steps to get the environment and UI running on your machine.
+We have containerized the entire pipeline and dashboard so you can run it effortlessly without installing any local Python or Node.js dependencies.
 
 ### 1. Requirements
-*   Python 3.10+
-*   Node.js 20+
+* Docker Desktop installed and running on your system.
 
 ### 2. Configure Environment (`.env`)
-First, create an environment variable file (`.env`) in the root directory. You must supply valid API keys to function properly without rate-limiting.
+First, create an environment variable file (`.env`) in the root directory. You must supply valid API keys for the Gemini LLM and USDA FoodData Central databases to function properly.
 
+Copy the example template to create your `.env` file:
 ```bash
 cp .env.example .env
 ```
 
-If `.env.example` doesn't exist, create `.env` manually:
+Then, open `.env` and add your keys:
 ```env
+# Google Gemini LLM API Key
 GEMINI_API_KEY=your_gemini_api_key_here
+
+# USDA FoodData Central API Key (Optional)
 FDC_API_KEY=your_fdc_api_key_here
 ```
 
-### 3. Setup Python Backend
-Create a virtual environment and install the required dependencies.
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-### 4. Start the Application UI
-Open a new terminal session, navigate to the frontend directory, install dependencies, and start the development server.
-
-```bash
-cd frontend/agnes-ui
-npm install
-npm run dev
-```
-Navigate to `http://localhost:3000` to interact with the pipeline via the dashboard.
-
----
-
-## 🐳 Running with Docker (Alternative)
-
-If you prefer an isolated container to run both the Python pipeline and Node.js UI instantly:
-
-1. **Ensure you've created your `.env` file** at the project root as described above.
-2. Run the helper bash script:
+### 3. Start the Full Stack Pipeline
+Run the provided helper bash script. This will automatically build the Docker image containing both the Python backend and Next.js UI. It will also map your `.env` file and local SQLite databases.
 
 ```bash
 ./run_docker.sh
 ```
 
-It will build the image and start the Next.js UI on port 3000. It also automatically maps the `./db` folder to preserve API caching between restarts!
+Once the Docker container finishes building and starts, navigate to `http://localhost:3000` in your web browser to interact with the pipeline via the dashboard!
