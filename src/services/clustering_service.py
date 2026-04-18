@@ -26,7 +26,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.feature_extraction.text import TfidfTransformer
 
-DEFAULT_DB = "../db.sqlite"
+DEFAULT_DB = "db.sqlite"
 
 # Minimum similarity score (0.0 to 1.0) to be considered a viable substitute
 MIN_SIMILARITY = 0.50
