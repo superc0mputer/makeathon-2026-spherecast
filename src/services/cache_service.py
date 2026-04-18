@@ -49,6 +49,13 @@ def init_db():
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS mintec_cache (
+            ingredient_name TEXT PRIMARY KEY,
+            price_per_kg REAL,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
     con.commit()
     con.close()
 
@@ -207,5 +214,39 @@ def set_pubchem(ingredient_name: str, data: dict):
         json.dumps(data.get("safety_hazards", [])),
         json.dumps(data.get("element_set", []))
     ))
+    con.commit()
+    con.close()
+
+def get_mintec(ingredient_name: str) -> dict:
+    con = _get_connection()
+    cur = con.cursor()
+    cur.execute("SELECT ingredient_name, price_per_kg FROM mintec_cache WHERE ingredient_name = ?", (ingredient_name.lower().strip(),))
+    row = cur.fetchone()
+    if not row:
+        # Fuzzy match logic if not found exactly (mimicking mock_mintec_api.py logic)
+        search_term = ingredient_name.lower().strip()
+        cur.execute("SELECT ingredient_name, price_per_kg FROM mintec_cache")
+        all_rows = cur.fetchall()
+        for r in all_rows:
+            key = r["ingredient_name"]
+            if search_term in key or key in search_term:
+                row = r
+                break
+
+    con.close()
+    if row:
+        return {"ingredient": row["ingredient_name"], "price_per_kg": row["price_per_kg"]}
+    return None
+
+def set_mintec(ingredient_name: str, price: float):
+    con = _get_connection()
+    cur = con.cursor()
+    cur.execute("""
+        INSERT INTO mintec_cache (ingredient_name, price_per_kg, updated_at) 
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(ingredient_name) DO UPDATE SET 
+            price_per_kg=excluded.price_per_kg,
+            updated_at=CURRENT_TIMESTAMP
+    """, (ingredient_name.lower().strip(), price))
     con.commit()
     con.close()
