@@ -13,7 +13,8 @@ EVALUATION CRITERIA:
 1. Chemical Similarity: The substitute must realistically replace the structural, textural, or flavor function of the target.
 2. BOM Incompatibilities: The substitute MUST NOT react negatively or conflict with other ingredients in the provided BOM. 
 3. Strict Filtering: If a candidate from the list is NOT a viable substitute, you must EXCLUDE it from the final list. Only return the candidates that actually work. 
-4. Empty Results: If NONE of the candidates are viable, return an empty array for "substitutes". Do not force a match.
+4. Class vs. Component Constraint: Do not suggest an isolated component (e.g., Vitamin B1) as a substitute for a complex or blend (e.g., B-Vitamin Complex or B Vitamins). Substitutes must offer the identical broad-spectrum nutritional function.
+5. Empty Results: If NONE of the candidates are viable, return an empty array for "substitutes". Do not force a match.
 
 ### INPUTS ###
 - Target Ingredient: {{target_ingredient}}
