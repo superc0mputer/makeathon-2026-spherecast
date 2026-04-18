@@ -259,17 +259,6 @@ export default function ResultsPage() {
               </section>
             )}
 
-            <section className="panel liveResultsPanel">
-              <h2>Cluster Candidates</h2>
-              <div className="clusterCandidateGrid">
-                {result.clusterCandidates.map((candidate) => (
-                  <div key={candidate.sku} className="clusterCandidateChip">
-                    <strong>{candidate.name}</strong>
-                    <span>{scorePercent(candidate.hybridSimilarity)}</span>
-                  </div>
-                ))}
-              </div>
-            </section>
           </>
         )}
       </section>
