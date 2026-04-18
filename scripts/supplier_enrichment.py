@@ -5,8 +5,12 @@ import logging
 from pathlib import Path
 from typing import Mapping, Sequence, Union
 
-from models import SupplierRecord, SupplierRecordDict
-from services import (
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.models.supplier_record import SupplierRecord, SupplierRecordDict
+from src.services import (
     NominatimGeocoder,
     enrich_suppliers_with_geodata,
     find_suppliers_for_ingredients,

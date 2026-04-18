@@ -9,7 +9,7 @@ Dependencies:
     pip install pandas scikit-learn plotly networkx
 
 Usage:
-    python ingredient_clustering_visualize_subs.py --target "ING-123" --db path/to/db.sqlite
+    python ingredient_clustering_visualize_subs.py --target "ING-123" --db path/db.sqlite
 """
 
 import argparse
@@ -142,7 +142,7 @@ def visualize_network(target_data: dict, out_path: str):
 def main():
     parser = argparse.ArgumentParser(description="Visualize Ingredient Substitutions for a Target")
     parser.add_argument("--target", required=True, help="The SKU of the ingredient to analyze (e.g. 'ING-123')")
-    parser.add_argument("--db", default="../db.sqlite", help="Path to db.sqlite")
+    parser.add_argument("--db", default="db.sqlite", help="Path to db.sqlite")
     parser.add_argument("--out-dir", default=".", help="Directory to write HTML output")
     args = parser.parse_args()
 
