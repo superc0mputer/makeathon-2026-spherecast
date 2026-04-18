@@ -293,7 +293,7 @@ for item in substitution_result.get("substitutes", []):
         "hybrid_similarity": item.get("hybrid_similarity", cluster_match["similarity_score"] if cluster_match else None),
     })
 
-enricher = SupplyChainEnricher(db_path="db/db.sqlite")
+enricher = SupplyChainEnricher(db_path=db_path)
 enriched = enricher.enrich_substitutes({"substitutes": resolved_substitutes}, company_coords=COMPANY_COORDS)
 enriched_substitutes = enriched.get("substitutes", [])
 

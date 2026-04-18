@@ -1,11 +1,12 @@
 import fs from 'node:fs'
+import path from 'node:path'
 
 import { NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const clusterHtmlPath = '/Users/maiafilip/Desktop/network_global_clusters.html'
+const clusterHtmlPath = path.resolve(process.cwd(), '..', '..', 'network_global_clusters.html')
 
 export async function GET() {
   try {

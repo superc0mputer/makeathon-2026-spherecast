@@ -1,9 +1,13 @@
 import { execFileSync } from 'node:child_process'
 import path from 'node:path'
+import fs from 'node:fs'
 
 import { NextRequest, NextResponse } from 'next/server'
 
-const dbPath = path.resolve(process.cwd(), '..', '..', 'db', 'db.sqlite')
+const repoRoot = path.resolve(process.cwd(), '..', '..')
+const dbPath = path.join(repoRoot, 'db', 'db.sqlite')
+const venvPython = path.join(repoRoot, '.venv', 'bin', 'python')
+const pythonBinary = fs.existsSync(venvPython) ? venvPython : 'python3'
 
 const pythonScript = `
 import json
@@ -128,9 +132,15 @@ export async function GET(request: NextRequest) {
     const companyId = request.nextUrl.searchParams.get('companyId')
     const productId = request.nextUrl.searchParams.get('productId')
 
-    const raw = execFileSync('python3', ['-c', pythonScript, dbPath, companyId ?? 'null', productId ?? 'null'], {
-      encoding: 'utf-8',
-    })
+    const raw = execFileSync(
+      pythonBinary,
+      ['-c', pythonScript, dbPath, companyId ?? 'null', productId ?? 'null'],
+      {
+        cwd: repoRoot,
+        encoding: 'utf-8',
+        env: process.env,
+      },
+    )
 
     return NextResponse.json(JSON.parse(raw))
   } catch (error) {
