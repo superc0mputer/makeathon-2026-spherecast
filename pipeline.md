@@ -24,7 +24,7 @@ This pipeline automates the process of finding viable, cost-effective, and low-r
     All API calls route through a local SQLite cache (`cache.sqlite`) to prevent rate-limiting, mitigate timeouts, and enable fast batch processing. Includes regex fallbacks to dynamically trim lengthy food-grade names if PubChem returns a 404.
 * **Step 4: Hybrid Cosine Similarity Scoring**
     Normalize features via `MinMaxScaler` and calculate a weighted similarity matrix.
-    * **Weighting Distribution:** `(BOM * 0.30) + (PubChem * 0.25) + (FDC * 0.25) + (Text * 0.20)`.
+    * **Weighting Distribution:** `(BOM * 0.20) + (PubChem * 0.25) + (FDC * 0.35) + (Text * 0.20)`.
     * **Absence Penalty:** Zeroes out chemical or nutritional similarity if either the target or candidate completely lacks vector data, preventing "Similarity by Absence" (where two empty profiles mathematically matched as 1.0).
     * **Linguistic Rescue (Text Similarity):** Leverages `difflib.SequenceMatcher` to safely map generic ingredient classes (e.g., "B Vitamins" to other "B Vitamins" variants) when raw biochemical data is unavailable.
     Output a shortlist of statistically viable substitutes.
