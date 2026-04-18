@@ -49,32 +49,26 @@ export default function Home() {
           </div>
         </header>
 
-        <section className="hero">
-          <h1>Agnes</h1>
-          <p>AI Supply Chain Manager</p>
+        <section className="agentRunCard">
+          <div className="agnesOverviewTag">AI Supply Chain Manager</div>
+          <h1>
+            Meet <span>Agnes</span>
+          </h1>
+          <p>
+            <strong>Agnes</strong> is an AI Supply Chain Manager built for <strong>CPG sourcing teams</strong>.
+            It connects fragmented BOM and supplier data, identifies credible substitute ingredients, and
+            prioritizes options based on business goals such as <strong>cost</strong>,{' '}
+            <strong>resilience</strong>, and <strong>sustainability</strong>.
+          </p>
+          <p>
+            Instead of only giving a score, Agnes provides <strong>transparent reasoning</strong> for each
+            recommendation so procurement, quality, and operations teams can make <strong>confident
+            decisions faster</strong>.
+          </p>
         </section>
 
-        {/* <section className="statGrid">
-          <article className="statCard">
-            <strong>21</strong>
-            <small>Products analyzed</small>
-          </article>
-          <article className="statCard">
-            <strong>39</strong>
-            <small>Substitute options</small>
-          </article>
-          <article className="statCard">
-            <strong>12</strong>
-            <small>Supplier consolidations</small>
-          </article>
-          <article className="statCard">
-            <strong>EUR 241k</strong>
-            <small>Estimated annual savings</small>
-          </article>
-        </section> */}
-
-        <section className="contentGrid">
-          <article className="panel leftPanel">
+        <section className="inputOnlyGrid">
+          <article className="panel leftPanel inputPanelLarge">
             <h2>Substitution Input</h2>
             <p className="muted">Enter one ingredient and choose the main optimization objective.</p>
 
@@ -103,21 +97,6 @@ export default function Home() {
                 </button>
               ))}
             </div>
-          </article>
-
-          <aside className="panel rightPanel">
-            <h3>Selected Target</h3>
-            <p className="ingredientValue">{ingredient.trim() || 'No ingredient entered yet'}</p>
-
-            <div className="miniBlock">
-              <span>Priority</span>
-              <strong>{selectedPriority}</strong>
-            </div>
-
-            <div className="miniBlock">
-              <span>Next Step</span>
-              <strong>Run matching and compliance checks</strong>
-            </div>
 
             <div className="runSection">
               <button
@@ -133,7 +112,7 @@ export default function Home() {
               </button>
               <p className="runStatus">{status}</p>
             </div>
-          </aside>
+          </article>
         </section>
       </section>
     </main>

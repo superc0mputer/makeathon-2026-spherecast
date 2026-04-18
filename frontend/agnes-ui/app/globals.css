@@ -180,6 +180,14 @@ body {
   gap: 14px;
 }
 
+.inputOnlyGrid {
+  margin-top: 14px;
+}
+
+.inputPanelLarge {
+  max-width: 100%;
+}
+
 .panel {
   background: #ffffff;
   border: 1px solid #d8e4fc;
@@ -279,7 +287,9 @@ body {
 }
 
 .runSection {
-  margin-top: 12px;
+  margin-top: 16px;
+  border-top: 1px solid #dfe8fa;
+  padding-top: 14px;
 }
 
 .runBtn {
@@ -608,5 +618,498 @@ body {
 
   .hero p {
     font-size: 1rem;
+  }
+}
+
+/* Results V2: card-based recommendation flow */
+.agentRunCard {
+  margin-top: 16px;
+  border: 1px solid #d6e3fb;
+  border-radius: 18px;
+  padding: 24px;
+  background:
+    linear-gradient(180deg, rgba(246, 250, 255, 0.98), rgba(242, 247, 255, 0.98)),
+    repeating-linear-gradient(
+      to right,
+      rgba(173, 191, 226, 0.18) 0,
+      rgba(173, 191, 226, 0.18) 1px,
+      transparent 1px,
+      transparent 42px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(173, 191, 226, 0.18) 0,
+      rgba(173, 191, 226, 0.18) 1px,
+      transparent 1px,
+      transparent 42px
+    );
+  position: relative;
+  overflow: hidden;
+}
+
+.agentRunCard::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4f7ee8, #62c4df);
+}
+
+.agnesOverviewTag {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #bdd4fa;
+  background: #edf4ff;
+  color: #3359be;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.agentRunMeta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: #687b99;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.runChip {
+  border: 1px solid #93d4e4;
+  background: #e6f8fd;
+  color: #215164;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.agentRunCard h1 {
+  margin: 0;
+  font-size: clamp(1.85rem, 3vw, 3rem);
+  letter-spacing: -0.02em;
+  color: #0f1628;
+}
+
+.agentRunCard h1 span {
+  background: linear-gradient(90deg, #2e56d6, #2f97d8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.agentRunCard p {
+  margin: 12px 0 0;
+  color: #5b6f8f;
+  font-size: 1.04rem;
+  line-height: 1.45;
+  max-width: 980px;
+}
+
+.agentRunCard p strong {
+  color: #1d325f;
+  font-weight: 700;
+}
+
+.agentRunActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.altGhost {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.9rem;
+}
+
+.darkRunBtn {
+  width: auto;
+  border-color: #0e1a35;
+  background: #08142f;
+}
+
+.runInfoGrid {
+  margin-top: 18px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.runInfoTile {
+  border: 1px solid #d7e5fd;
+  border-radius: 14px;
+  background: #fcfdff;
+  padding: 12px;
+  display: grid;
+  gap: 4px;
+}
+
+.runInfoTile small {
+  color: #7386a6;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.runInfoTile strong {
+  color: #111b30;
+  font-size: 1.05rem;
+}
+
+.runInfoTile span {
+  color: #6d7f9d;
+  font-size: 0.92rem;
+}
+
+.recHeader {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.recHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.recHeader h2 {
+  margin: 0;
+  font-size: 2rem;
+  color: #101a30;
+}
+
+.recHeader p {
+  margin: 6px 0 0;
+  color: #61728f;
+}
+
+.updatedNow {
+  color: #1f9a60;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.collapseAllBtn {
+  border: 1px solid #c8d9fb;
+  border-radius: 999px;
+  background: #f6f9ff;
+  color: #355ac8;
+  font-weight: 700;
+  font-size: 0.86rem;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.expandedStack {
+  margin-top: 12px;
+  display: grid;
+  gap: 12px;
+}
+
+.recGrid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.recCard {
+  border: 1px solid #d8e5fb;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+}
+
+.recCard:hover {
+  border-color: #aec5ef;
+  box-shadow: 0 8px 18px rgba(44, 74, 128, 0.08);
+}
+
+.recCard.active {
+  border-color: #4f7ee8;
+  box-shadow: 0 0 0 2px rgba(79, 126, 232, 0.16);
+}
+
+.recCardTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.recCardTop h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #121d33;
+}
+
+.recCardTop p {
+  margin: 4px 0 0;
+  color: #6a7c99;
+  font-size: 0.92rem;
+}
+
+.recScoreBlock {
+  text-align: right;
+}
+
+.recScoreBlock span {
+  display: block;
+  color: #6f819f;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.recScoreBlock strong {
+  color: #101a30;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.recTags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.recTags span {
+  border: 1px solid #d5e2f9;
+  border-radius: 999px;
+  padding: 4px 10px;
+  color: #4f6283;
+  font-size: 0.82rem;
+  background: #f8fbff;
+}
+
+.recCardBottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #5f7290;
+  font-size: 0.9rem;
+  align-items: center;
+}
+
+.recCardBottom strong {
+  color: #1f9a60;
+  font-size: 0.92rem;
+}
+
+.detailCard {
+  border: 1px solid #d8e5fb;
+  border-radius: 20px;
+  background: #ffffff;
+  padding: 16px;
+}
+
+.detailCardTopActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.closePopupBtn {
+  border: 1px solid #c6d9fb;
+  border-radius: 999px;
+  background: #f6f9ff;
+  color: #355ac8;
+  font-weight: 700;
+  font-size: 0.84rem;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.detailHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detailHead h3 {
+  margin: 0;
+  font-size: 1.9rem;
+  color: #111c33;
+}
+
+.detailHead p {
+  margin: 6px 0 0;
+  color: #6e809e;
+}
+
+.detailScore strong {
+  font-size: 2.4rem;
+}
+
+.detailTags {
+  margin-top: 10px;
+}
+
+.detailMetrics {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.recMetricRow {
+  display: grid;
+  gap: 5px;
+}
+
+.recMetricTop {
+  display: flex;
+  justify-content: space-between;
+  color: #4b5e7d;
+  font-size: 0.95rem;
+}
+
+.recMetricTop strong {
+  color: #1a253f;
+}
+
+.recMetricTrack {
+  border-radius: 999px;
+  height: 8px;
+  background: #e5edf9;
+  overflow: hidden;
+}
+
+.recMetricFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #1ea965, #1fbfcb);
+}
+
+.supplierRow {
+  margin-top: 14px;
+  border: 1px solid #dce7fa;
+  border-radius: 12px;
+  background: #fbfdff;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.supplierRow strong {
+  display: block;
+  color: #13203a;
+}
+
+.supplierRow span {
+  color: #6f819e;
+}
+
+.supplierMeta {
+  text-align: right;
+}
+
+.costRow {
+  margin-top: 14px;
+  border-top: 1px solid #e3ebfa;
+  border-bottom: 1px solid #e3ebfa;
+  padding: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.costRow small {
+  color: #6c7e9b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.costRow strong {
+  display: block;
+  color: #101a30;
+  font-size: 1.85rem;
+  margin-top: 4px;
+}
+
+.costRow strong span {
+  font-size: 1.1rem;
+  color: #5d7090;
+}
+
+.costRow em {
+  color: #1f9a60;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.aiRecommendationBox {
+  margin-top: 12px;
+  border: 1px solid #dde7fa;
+  border-radius: 14px;
+  background: #fbfdff;
+  padding: 12px;
+}
+
+.aiRecommendationBox small {
+  color: #4f7ee8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  font-size: 0.72rem;
+}
+
+.aiRecommendationBox p {
+  margin: 6px 0 0;
+  color: #384d72;
+  line-height: 1.45;
+}
+
+.selectBtn {
+  margin-top: 12px;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 980px) {
+  .runInfoGrid,
+  .recGrid,
+  .detailMetrics {
+    grid-template-columns: 1fr;
+  }
+
+  .agentRunActions {
+    flex-wrap: wrap;
+  }
+
+  .detailHead,
+  .recCardBottom,
+  .supplierRow,
+  .costRow,
+  .recHeader,
+  .recHeaderActions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .recScoreBlock,
+  .supplierMeta {
+    text-align: left;
   }
 }
