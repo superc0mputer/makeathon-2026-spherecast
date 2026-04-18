@@ -15,7 +15,6 @@ class SupplierRecordDict(TypedDict):
     lng: Optional[float]
     distance_km: Optional[float]
     resolved_address: Optional[str]
-    google_place_id: Optional[str]
     match_method: Optional[MatchMethod]
     match_confidence: Optional[MatchConfidence]
 
@@ -30,7 +29,6 @@ class SupplierRecord:
     lng: Optional[float] = None
     distance_km: Optional[float] = None
     resolved_address: Optional[str] = None
-    google_place_id: Optional[str] = None
     match_method: Optional[MatchMethod] = None
     match_confidence: Optional[MatchConfidence] = None
 
@@ -44,7 +42,6 @@ class SupplierRecord:
             "lng": self.lng,
             "distance_km": self.distance_km,
             "resolved_address": self.resolved_address,
-            "google_place_id": self.google_place_id,
             "match_method": self.match_method,
             "match_confidence": self.match_confidence,
         }

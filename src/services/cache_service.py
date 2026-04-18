@@ -56,6 +56,18 @@ def init_db():
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS nominatim_cache (
+            supplier_name TEXT PRIMARY KEY,
+            lat REAL,
+            lng REAL,
+            resolved_address TEXT,
+            match_method TEXT,
+            match_confidence TEXT,
+            matched_name TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
     con.commit()
     con.close()
 
@@ -250,3 +262,52 @@ def set_mintec(ingredient_name: str, price: float):
     """, (ingredient_name.lower().strip(), price))
     con.commit()
     con.close()
+
+def get_nominatim(supplier_name: str, max_age_days: int = None) -> dict:
+    con = _get_connection()
+    cur = con.cursor()
+    if max_age_days is not None:
+        cur.execute("SELECT * FROM nominatim_cache WHERE supplier_name = ? AND updated_at >= datetime('now', ? || ' days')", (supplier_name.lower(), -max_age_days))
+    else:
+        cur.execute("SELECT * FROM nominatim_cache WHERE supplier_name = ?", (supplier_name.lower(),))
+    row = cur.fetchone()
+    con.close()
+    if row:
+        return {
+            "lat": row["lat"],
+            "lng": row["lng"],
+            "resolved_address": row["resolved_address"],
+            "match_method": row["match_method"],
+            "match_confidence": row["match_confidence"],
+            "matched_name": row["matched_name"]
+        }
+    return None
+
+def set_nominatim(supplier_name: str, data: dict):
+    con = _get_connection()
+    cur = con.cursor()
+    cur.execute("""
+        INSERT INTO nominatim_cache (
+            supplier_name, lat, lng, resolved_address, 
+            match_method, match_confidence, matched_name, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(supplier_name) DO UPDATE SET 
+            lat=excluded.lat,
+            lng=excluded.lng,
+            resolved_address=excluded.resolved_address,
+            match_method=excluded.match_method,
+            match_confidence=excluded.match_confidence,
+            matched_name=excluded.matched_name,
+            updated_at=CURRENT_TIMESTAMP
+    """, (
+        supplier_name.lower(),
+        data.get("lat"),
+        data.get("lng"),
+        data.get("resolved_address"),
+        data.get("match_method"),
+        data.get("match_confidence"),
+        data.get("matched_name")
+    ))
+    con.commit()
+    con.close()
+

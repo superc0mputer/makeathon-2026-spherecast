@@ -8,6 +8,7 @@ from typing import Any, Optional, Sequence, TypedDict, cast
 
 from src.models.supplier_record import MatchConfidence, MatchMethod, SupplierRecord
 from src.api_clients.nominatim_client import NominatimClient
+from src.services.cache_service import get_nominatim, set_nominatim
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,6 @@ class GeocodeResult(TypedDict):
     lat: float
     lng: float
     resolved_address: str
-    google_place_id: Optional[str]
     match_method: MatchMethod
     match_confidence: MatchConfidence
     matched_name: str
@@ -32,18 +32,53 @@ class NominatimGeocoder:
         self._last_request_timestamp = 0.0
 
     def geocode_supplier(self, supplier_name: str) -> GeocodeResult:
+        cached = get_nominatim(supplier_name)
+        if cached:
+            return {
+                "lat": cached["lat"],
+                "lng": cached["lng"],
+                "resolved_address": cached["resolved_address"],
+                "match_method": cached.get("match_method", "name_only"),
+                "match_confidence": cached.get("match_confidence", "high"),
+                "matched_name": cached.get("matched_name", supplier_name),
+            }
+
         self._respect_rate_limit()
-        places = NominatimClient.search_supplier(supplier_name)
+        try:
+            places = NominatimClient.search_supplier(supplier_name)
+        except Exception as e:
+            # Prevent throwing if network fails
+            places = []
         self._last_request_timestamp = time.monotonic()
 
         if not places:
-            raise ValueError(f"No Nominatim match returned for supplier: {supplier_name}")
+            # Do not throw an exception, return an empty profile and cache it
+            result: GeocodeResult = {
+                "lat": 0.0,
+                "lng": 0.0,
+                "resolved_address": "",
+                "match_method": "name_only",
+                "match_confidence": "low",
+                "matched_name": supplier_name,
+            }
+            set_nominatim(supplier_name, result)
+            return result
 
         top_place = places[0]
         lat_text = cast(Optional[str], top_place.get("lat"))
         lng_text = cast(Optional[str], top_place.get("lon"))
         if lat_text is None or lng_text is None:
-            raise ValueError(f"Nominatim returned no coordinates for supplier: {supplier_name}")
+            # Do not throw, cache the failure
+            result: GeocodeResult = {
+                "lat": 0.0,
+                "lng": 0.0,
+                "resolved_address": "",
+                "match_method": "name_only",
+                "match_confidence": "low",
+                "matched_name": supplier_name,
+            }
+            set_nominatim(supplier_name, result)
+            return result
 
         display_name = cast(str, top_place.get("display_name", ""))
         name_parts = [part.strip() for part in display_name.split(",") if part.strip()]
@@ -54,11 +89,11 @@ class NominatimGeocoder:
             "lat": float(lat_text),
             "lng": float(lng_text),
             "resolved_address": display_name,
-            "google_place_id": None,
             "match_method": "name_only",
             "match_confidence": confidence,
             "matched_name": matched_name,
         }
+        set_nominatim(supplier_name, result)
         return result
 
     def _respect_rate_limit(self) -> None:
@@ -102,7 +137,7 @@ def enrich_suppliers_with_geodata(
         if geocoder is None:
             supplier.address = ""
             supplier.lat, supplier.lng, supplier.distance_km = None, None, None
-            supplier.resolved_address, supplier.google_place_id = None, None
+            supplier.resolved_address = None
             supplier.match_method, supplier.match_confidence = None, None
             continue
 
@@ -110,7 +145,6 @@ def enrich_suppliers_with_geodata(
             geocode_result = geocoder.geocode_supplier(supplier.name)
             supplier.address = geocode_result["resolved_address"] or ""
             supplier.resolved_address = geocode_result["resolved_address"] or None
-            supplier.google_place_id = geocode_result["google_place_id"]
             supplier.match_method = geocode_result["match_method"]
             supplier.match_confidence = geocode_result["match_confidence"]
 
@@ -126,7 +160,7 @@ def enrich_suppliers_with_geodata(
             logger.warning("Failed to geocode supplier %s: %s", supplier.name, exc)
             supplier.address = ""
             supplier.lat, supplier.lng, supplier.distance_km = None, None, None
-            supplier.resolved_address, supplier.google_place_id = None, None
+            supplier.resolved_address = None
             supplier.match_method = "name_only"
             supplier.match_confidence = "low"
 

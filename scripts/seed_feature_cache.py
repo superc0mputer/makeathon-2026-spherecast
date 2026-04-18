@@ -10,6 +10,7 @@ from src.services.cache_service import init_db
 from src.services.fdc_service import FDCService
 from src.services.pubchem_service import enrich_ingredient
 from src.services.supplier_db_service import ingredient_name_from_sku
+from src.services.nominatim_service import NominatimGeocoder
 
 def main():
     load_dotenv()
@@ -36,17 +37,21 @@ def main():
         cur = con.cursor()
         cur.execute("SELECT DISTINCT SKU FROM Product WHERE Type = 'raw-material'")
         skus = [row[0] for row in cur.fetchall()]
+        
+        cur.execute("SELECT DISTINCT Name FROM Supplier")
+        suppliers = [row[0] for row in cur.fetchall()]
         con.close()
         
         # Convert SKUs to real names and deduplicate
         materials = list(set([ingredient_name_from_sku(sku) for sku in skus]))
-        print(f"Found {len(materials)} raw materials.")
+        print(f"Found {len(materials)} raw materials and {len(suppliers)} suppliers.")
     except Exception as e:
         print(f"❌ Error loading from database: {e}")
         return
 
     fdc_api_key = os.environ.get("FDC_API_KEY")
     fdc_service = FDCService(api_key=fdc_api_key)
+    geocoder = NominatimGeocoder()
 
     print(f"\nStarting seed process checking cache max age of {args.max_age} days. This may take a while depending on API rate limits...")
     
@@ -73,8 +78,21 @@ def main():
             
         success_count += 1
         
+    print(f"\nStarting supplier geocode seeding...")
+    supplier_count = 0
+    for i, supplier_name in enumerate(suppliers):
+        print(f"[{i+1}/{len(suppliers)}] Geocoding supplier: {supplier_name}... ", end="", flush=True)
+        try:
+            # We don't support max_age_days right now in geocode_supplier, but we can just call it
+            # and it will skip hitting the API if the cache holds a record
+            res = geocoder.geocode_supplier(supplier_name)
+            print(f"Status: {res.get('match_confidence')} match")
+            supplier_count += 1
+        except Exception as e:
+            print(f"Error: {e}")
+            
     print("\n=====================================================")
-    print(f"✅ Seeding Complete! Processed {success_count} materials.")
+    print(f"✅ Seeding Complete! Processed {success_count} materials and {supplier_count} suppliers.")
     print("=====================================================")
 
 if __name__ == "__main__":

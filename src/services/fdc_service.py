@@ -35,9 +35,19 @@ class FDCService:
                 "nutrients": {}
             }
             
+            # Keep only essential macro/micronutrients to reduce LLM tokens
+            ESSENTIAL_NUTRIENTS = {
+                "Energy", "Protein", "Total lipid (fat)", "Carbohydrate, by difference", 
+                "Sugars, total including NLEA", "Fiber, total dietary",
+                "Calcium, Ca", "Iron, Fe", "Sodium, Na", "Vitamin C, total ascorbic acid",
+                "Vitamin D (D2 + D3)", "Potassium, K"
+            }
+            
             # Important macros, vitamins, and minerals
             for n in nutrients:
                 name = n.get("nutrientName", "")
+                if name not in ESSENTIAL_NUTRIENTS:
+                    continue
                 amount = n.get("value")
                 unit = n.get("unitName", "")
                 
