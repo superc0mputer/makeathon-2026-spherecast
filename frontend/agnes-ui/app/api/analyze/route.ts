@@ -159,9 +159,20 @@ def heuristic_reason(substitute, supplier, priority_key):
         return f"Ranked highly for sustainability because it remains substitutable ({confidence}/100 confidence) and the selected supplier is relatively close at about {distance} km."
     return f"Ranked as a strong overall option with {confidence}/100 substitutability confidence and available supplier support."
 
-def build_fallback_recommendations(substitutes, priority_key):
+def build_fallback_recommendations(substitutes, priority_key, current_supplier_names_str):
+    valid_substitutes = []
+    forbidden_suppliers = [s.strip().lower() for s in (current_supplier_names_str or "").split(",") if s.strip()]
+
+    for item in substitutes:
+        suppliers = item.get("suppliers", []) or []
+        valid_suppliers = [sup for sup in suppliers if sup.get("name", "").lower() not in forbidden_suppliers]
+        if valid_suppliers:
+            item_copy = dict(item)
+            item_copy["suppliers"] = valid_suppliers
+            valid_substitutes.append(item_copy)
+
     ranked = sorted(
-        substitutes,
+        valid_substitutes,
         key=lambda item: score_candidate(item, priority_key),
         reverse=True,
     )[:3]
@@ -206,6 +217,18 @@ ingredient_rows = conn.execute(
     """,
     (product_id,),
 ).fetchall()
+
+current_suppliers_rows = conn.execute(
+    """
+    SELECT s.Name
+    FROM Product p
+    JOIN Supplier_Product sp ON p.Id = sp.ProductId
+    JOIN Supplier s ON sp.SupplierId = s.Id
+    WHERE p.SKU = ?
+    """,
+    (target_sku,)
+).fetchall()
+current_supplier_names = ", ".join([r["Name"] for r in current_suppliers_rows]) if current_suppliers_rows else None
 
 conn.close()
 
@@ -308,6 +331,7 @@ else:
             "selected_priority": priority_label,
             "priority_key": priority,
         },
+        current_supplier=current_supplier_names,
         candidates=[
             SourcedMaterial(
                 substitute_name=item.get("substitute_name", ""),
@@ -342,7 +366,7 @@ else:
     if not recommendation_result or "error" in recommendation_result:
         if isinstance(recommendation_result, dict) and recommendation_result.get("error"):
             recommendation_error = recommendation_result["error"]
-        recommendation_result = build_fallback_recommendations(enriched_substitutes, priority)
+        recommendation_result = build_fallback_recommendations(enriched_substitutes, priority, current_supplier_names)
 
 available_substitutes = {
     normalize_name(item.get("substitute_name", "")): item
@@ -357,9 +381,11 @@ for recommendation in recommendation_result.get("top_3_recommendations", []):
     sanitized_recommendations.append(recommendation)
     seen_recommendations.add(normalized_name)
 
-expected_recommendation_count = min(3, len(enriched_substitutes))
-if len(sanitized_recommendations) != expected_recommendation_count:
-    recommendation_result = build_fallback_recommendations(enriched_substitutes, priority)
+# If LLM didn't return correctly or we had to filter things out entirely:
+if not sanitized_recommendations and enriched_substitutes:
+    fallback_res = build_fallback_recommendations(enriched_substitutes, priority, current_supplier_names)
+    recommendation_result = fallback_res
+    sanitized_recommendations = fallback_res.get("top_3_recommendations", [])
 else:
     recommendation_result = {"top_3_recommendations": sanitized_recommendations}
 
@@ -385,9 +411,17 @@ recommendation_lookup = {
     for item in top_recommendations
 }
 
+forbidden_suppliers = [s.strip().lower() for s in (current_supplier_names or "").split(",") if s.strip()]
+
 for item in enriched_substitutes:
     normalized_name = normalize_name(item.get("substitute_name", ""))
     recommendation = recommendation_lookup.get(normalized_name)
+    
+    # Exclude substitute entirely if its ONLY suppliers are the ones we already use
+    item_suppliers = [s.get("name", "").lower() for s in (item.get("suppliers", []) or [])]
+    if item_suppliers and all(s in forbidden_suppliers for s in item_suppliers):
+        continue
+
     resolved_substitute_cards.append({
         "name": item.get("substitute_name"),
         "sku": item.get("candidate_sku"),

@@ -8,6 +8,7 @@ Your ultimate goal is to identify the Top 3 best substitute/supplier combination
 - Company Coordinates: {{company_coords}}
 - Selected Optimization Priority: {{optimization_priority}}
 - End-User Priority Weights: {{preference_weights}}
+- Current Supplier(s): {{current_supplier}}
 
 ### ENRICHED PIPELINE DATA (Phase 3 Options) ###
 This JSON represents all chemically viable substitute candidates from Phase 2, enriched with their Mintec Prices and physical OpenStreetMap Suppliers details:
@@ -27,6 +28,8 @@ Evaluate and rank the options based strictly on the following criteria:
    Never remove a substitute for business reasons if it is already in the candidate set; use the priority to adjust final ranking and explanation.
 
 ### REQUIRED OUTPUT ###
+You must enforce this strict constraint first: If a substitute's ONLY supplier is one of the Current Supplier(s) listed above, you must NOT include it in the output. If a substitute has multiple suppliers, you MUST ignore the supplier belonging to Current Supplier(s) and only pick a different one. If after filtering out Current Supplier(s) there are no valid recommendations available at all, return an empty array for `top_3_recommendations` (e.g., `{"top_3_recommendations": []}`).
+
 You must respond with ONLY a valid, strict JSON object. Do not include markdown formatting (like ```json) or explanations outside the JSON.
-You must output exactly 3 recommendations in the array, ranked 1 to 3. Follow the schema provided. 
-For each substitute recommendation, select EXACTLY ONE optimal supplier from its available array of suppliers, and explain your reasoning in the summary focusing purely on supply chain metrics (price, distance, reliability).
+You must output up to 3 recommendations in the array, ranked 1 to 3. Follow the schema provided. 
+For each substitute recommendation, select EXACTLY ONE optimal supplier from its available array of suppliers (ignoring the Current Supplier), and explain your reasoning in the summary focusing purely on supply chain metrics (price, distance, reliability).

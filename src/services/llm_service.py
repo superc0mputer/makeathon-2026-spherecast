@@ -77,6 +77,7 @@ class IngredientLLMClient:
         prompt = prompt.replace("{{bom_ingredients}}", json.dumps(context.bom_ingredients))
         prompt = prompt.replace("{{preference_weights}}", json.dumps(context.preference_weights))
         prompt = prompt.replace("{{optimization_priority}}", context.preference_weights.get("selected_priority", "Reduce Cost"))
+        prompt = prompt.replace("{{current_supplier}}", context.current_supplier or "Unknown")
         
         # Serialize the validated Pydantic substitutes directly into the prompt
         sub_dump = [sub.model_dump() for sub in context.candidates]

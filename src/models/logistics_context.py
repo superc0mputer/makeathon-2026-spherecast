@@ -28,4 +28,5 @@ class LogisticsContext(BaseModel):
     company_coords: List[float]
     bom_ingredients: List[str]
     preference_weights: Dict[str, str]
+    current_supplier: Optional[str] = None
     candidates: List[SourcedMaterial]
