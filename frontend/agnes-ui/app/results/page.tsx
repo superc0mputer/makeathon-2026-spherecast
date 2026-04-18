@@ -1,166 +1,114 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-type Recommendation = {
-  id: string
+type ClusterCandidate = {
+  sku: string
   name: string
-  cas: string
-  formula: string
-  tags: string[]
-  score: number
-  supplier: string
-  supplierLocation: string
-  distanceKm: number
-  transitDays: number
-  landedCost: number
-  savingsPct: number
-  confidence: number
-  scores: {
-    substitutability: number
-    supplyChain: number
-    bomMatch: number
-    sustainability: number
-  }
-  aiRecommendation: string
+  hybridSimilarity: number
 }
 
-const recommendations: Recommendation[] = [
-  {
-    id: 'potassium-sorbate',
-    name: 'Potassium Sorbate',
-    cas: '24634-61-5',
-    formula: 'C6H7KO2',
-    tags: ['FDA Approved', 'EU Compliant', 'Drop-in'],
-    score: 94,
-    supplier: 'Nordic BioChem AS',
-    supplierLocation: 'Hamburg, DE',
-    distanceKm: 412,
-    transitDays: 4,
-    landedCost: 3.85,
-    savingsPct: 8.3,
-    confidence: 96,
-    scores: {
-      substitutability: 96,
-      supplyChain: 95,
-      bomMatch: 92,
-      sustainability: 88,
-    },
-    aiRecommendation:
-      'Strongest preservative match with near-identical pH activity range. Hamburg-based supplier provides 4-day transit and measurable sourcing savings versus current baseline.',
-  },
-  {
-    id: 'calcium-propionate',
-    name: 'Calcium Propionate',
-    cas: '4075-81-4',
-    formula: 'C6H10CaO4',
-    tags: ['EU Compliant', 'Bakery Proven', 'Low Risk'],
-    score: 91,
-    supplier: 'GreenMaterials Inc.',
-    supplierLocation: 'Munich, DE',
-    distanceKm: 186,
-    transitDays: 2,
-    landedCost: 3.96,
-    savingsPct: 6.9,
-    confidence: 93,
-    scores: {
-      substitutability: 92,
-      supplyChain: 93,
-      bomMatch: 90,
-      sustainability: 89,
-    },
-    aiRecommendation:
-      'High-confidence substitute with strong regional supplier reliability. Best fit when balancing cost improvement with smooth implementation across existing production lines.',
-  },
-  {
-    id: 'sodium-acetate',
-    name: 'Sodium Acetate',
-    cas: '127-09-3',
-    formula: 'C2H3NaO2',
-    tags: ['Drop-in', 'EU Compliant', 'High Availability'],
-    score: 88,
-    supplier: 'ValueChem Ltd.',
-    supplierLocation: 'Rotterdam, NL',
-    distanceKm: 617,
-    transitDays: 5,
-    landedCost: 4.02,
-    savingsPct: 5.4,
-    confidence: 90,
-    scores: {
-      substitutability: 89,
-      supplyChain: 90,
-      bomMatch: 87,
-      sustainability: 86,
-    },
-    aiRecommendation:
-      'Operationally practical option with broad supplier depth. Recommended as a resilient dual-source lane for categories with volatile demand.',
-  },
-  {
-    id: 'natamycin',
-    name: 'Natamycin',
-    cas: '7681-93-8',
-    formula: 'C33H47NO13',
-    tags: ['Label Friendly', 'Premium SKU Fit', 'EU Compliant'],
-    score: 86,
-    supplier: 'PureAxis Labs',
-    supplierLocation: 'Zurich, CH',
-    distanceKm: 302,
-    transitDays: 3,
-    landedCost: 4.18,
-    savingsPct: 4.1,
-    confidence: 89,
-    scores: {
-      substitutability: 87,
-      supplyChain: 88,
-      bomMatch: 85,
-      sustainability: 90,
-    },
-    aiRecommendation:
-      'Best suited for premium formulations where clean-label positioning matters. Provides moderate savings with positive sustainability impact and limited rollout friction.',
-  },
-]
+type Substitute = {
+  name: string
+  sku: string | null
+  confidenceScore: number
+  reasoning: string
+  hybridSimilarity: number | null
+}
 
-function MetricBar({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="recMetricRow">
-      <div className="recMetricTop">
-        <span>{label}</span>
-        <strong>{value}</strong>
-      </div>
-      <div className="recMetricTrack">
-        <div className="recMetricFill" style={{ width: `${value}%` }} />
-      </div>
-    </div>
-  )
+type AnalysisResult = {
+  product: {
+    id: number
+    sku: string
+    label: string
+    companyName: string
+  }
+  targetIngredient: {
+    sku: string
+    name: string
+  }
+  priority: string
+  bomIngredientNames: string[]
+  clusterCandidates: ClusterCandidate[]
+  substitutes: Substitute[]
+  usedFallback: boolean
+  llmError: string | null
+}
+
+const priorityLabels: Record<string, string> = {
+  cost: 'Reduce Cost',
+  suppliers: 'Reduce Supplier Count',
+  risk: 'Reduce Risk / Improve Reliability',
+  sustainability: 'Improve Sustainability',
+}
+
+function formatPriority(priority: string) {
+  return priorityLabels[priority] ?? priority
+}
+
+function scorePercent(value: number | null | undefined) {
+  if (value == null) return 'n/a'
+  return `${Math.round(value * 100)}%`
 }
 
 export default function ResultsPage() {
-  const [openIds, setOpenIds] = useState<string[]>([])
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const productId = searchParams.get('productId')
+  const targetSku = searchParams.get('targetSku')
+  const priority = searchParams.get('priority') ?? 'cost'
+  const missingSelection = !productId || !targetSku
 
-  const openRecommendations = useMemo(
-    () =>
-      openIds
-        .map((id) => recommendations.find((item) => item.id === id))
-        .filter((item): item is Recommendation => Boolean(item)),
-    [openIds],
-  )
+  const [result, setResult] = useState<AnalysisResult | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const closedRecommendations = useMemo(
-    () => recommendations.filter((item) => !openIds.includes(item.id)),
-    [openIds],
-  )
+  useEffect(() => {
+    if (missingSelection) {
+      return
+    }
 
-  function openRecommendation(id: string) {
-    setOpenIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
-  }
+    let cancelled = false
 
-  function closeRecommendation(id: string) {
-    setOpenIds((prev) => prev.filter((item) => item !== id))
-  }
+    async function loadAnalysis() {
+      try {
+        setLoading(true)
+        const params = new URLSearchParams({
+          productId,
+          targetSku,
+          priority,
+        })
+        const response = await fetch(`/api/analyze?${params.toString()}`, { cache: 'no-store' })
+        const data = (await response.json()) as AnalysisResult & { error?: string }
 
-  function closeAllRecommendations() {
-    setOpenIds([])
-  }
+        if (!response.ok) {
+          throw new Error(data.error ?? 'Failed to run substitution analysis.')
+        }
+
+        if (!cancelled) {
+          setResult(data)
+          setError(null)
+        }
+      } catch (err) {
+        console.error(err)
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to run substitution analysis.')
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    void loadAnalysis()
+    return () => {
+      cancelled = true
+    }
+  }, [missingSelection, priority, productId, targetSku])
+
+  const topSubstitutes = useMemo(() => result?.substitutes ?? [], [result])
 
   return (
     <main className="pageShell">
@@ -181,193 +129,148 @@ export default function ResultsPage() {
           </nav>
 
           <div className="actions">
-            <button type="button" className="loginBtn">
-              Log In
-            </button>
-            <button type="button" className="ghostBtn">
-              Book a Demo
+            <button type="button" className="ghostBtn" onClick={() => router.push('/')}>
+              Back
             </button>
           </div>
         </header>
 
         <section className="agentRunCard">
           <div className="agentRunMeta">
-            <span className="runChip">● Substitution Run</span>
-            <span>Initiated 2 min ago • 23.3s total runtime</span>
+            <span className="runChip">● Live Analysis</span>
+            <span>{loading ? 'Running clustering and LLM validation...' : 'Analysis complete'}</span>
           </div>
 
           <h1>
-            Finding substitutes for <span>Sodium Benzoate (E211)</span>
+            Finding substitutes for <span>{result?.targetIngredient.name ?? 'selected ingredient'}</span>
           </h1>
           <p>
-            Ranked by chemical viability, supply chain risk, sustainability, and total landed cost
-            across Beverage Concentrate v3.4.
+            This run combines hybrid substitute discovery, profile enrichment, and contextual LLM
+            validation for the selected finished good.
           </p>
-
-          <div className="agentRunActions">
-            <button type="button" className="ghostBtn altGhost">
-              Adjust Weights
-            </button>
-            <button type="button" className="runBtn darkRunBtn">
-              Export Report
-            </button>
-          </div>
 
           <div className="runInfoGrid">
             <article className="runInfoTile">
-              <small>CAS Number</small>
-              <strong>532-32-1</strong>
-              <span>C7H5NaO2</span>
+              <small>Company</small>
+              <strong>{result?.product.companyName ?? 'Loading...'}</strong>
+              <span>Customer context from the SQLite catalog</span>
             </article>
             <article className="runInfoTile">
-              <small>BOM</small>
-              <strong>Beverage Concentrate v3.4</strong>
-              <span>1,240 kg / batch</span>
+              <small>Product</small>
+              <strong>{result?.product.label ?? 'Loading...'}</strong>
+              <span>{result?.product.sku ?? 'Waiting for product info'}</span>
             </article>
             <article className="runInfoTile">
-              <small>Origin</small>
-              <strong>Munich, DE</strong>
-              <span>48.1351° N, 11.5820° E</span>
+              <small>Target Ingredient</small>
+              <strong>{result?.targetIngredient.name ?? 'Loading...'}</strong>
+              <span>{result?.targetIngredient.sku ?? 'Waiting for ingredient info'}</span>
             </article>
             <article className="runInfoTile">
-              <small>Current Cost</small>
-              <strong>$4.20/kg</strong>
-              <span>ChemPro Industries</span>
+              <small>Priority</small>
+              <strong>{formatPriority(priority)}</strong>
+              <span>{result ? `${result.bomIngredientNames.length} BOM ingredients in context` : 'Preparing context'}</span>
             </article>
           </div>
         </section>
 
-        <section className="recHeader">
-          <div>
-            <h2>Top Recommendations</h2>
-            <p>Ranked by the multi-criteria decision engine</p>
-          </div>
-          <div className="recHeaderActions">
-            <span className="updatedNow">● Updated just now</span>
-            {openIds.length > 0 && (
-              <button type="button" className="collapseAllBtn" onClick={closeAllRecommendations}>
-                Back to all substitutes
-              </button>
-            )}
-          </div>
-        </section>
-
-        {openRecommendations.length > 0 && (
-          <section className="expandedStack">
-            {openRecommendations.map((selected) => (
-              <article key={selected.id} className="detailCard">
-                <div className="detailCardTopActions">
-                  <button
-                    type="button"
-                    className="closePopupBtn"
-                    onClick={() => closeRecommendation(selected.id)}
-                  >
-                    Close
-                  </button>
-                </div>
-                <div className="detailHead">
-                  <div>
-                    <h3>{selected.name}</h3>
-                    <p>
-                      CAS {selected.cas} • {selected.formula}
-                    </p>
-                  </div>
-                  <div className="recScoreBlock detailScore">
-                    <span>Score</span>
-                    <strong>{selected.score}</strong>
-                  </div>
-                </div>
-
-                <div className="recTags detailTags">
-                  {selected.tags.map((tag) => (
-                    <span key={tag}>{tag}</span>
-                  ))}
-                </div>
-
-                <div className="detailMetrics">
-                  <MetricBar label="Substitutability" value={selected.scores.substitutability} />
-                  <MetricBar label="BOM Match" value={selected.scores.bomMatch} />
-                  <MetricBar label="Supply Chain" value={selected.scores.supplyChain} />
-                  <MetricBar label="Sustainability" value={selected.scores.sustainability} />
-                </div>
-
-                <div className="supplierRow">
-                  <div>
-                    <strong>{selected.supplier}</strong>
-                    <span>{selected.supplierLocation}</span>
-                  </div>
-                  <div className="supplierMeta">
-                    <strong>{selected.distanceKm} km</strong>
-                    <span>{selected.transitDays}d transit</span>
-                  </div>
-                </div>
-
-                <div className="costRow">
-                  <div>
-                    <small>Landed Cost</small>
-                    <strong>
-                      ${selected.landedCost.toFixed(2)} <span>/kg</span>
-                    </strong>
-                    <em>↓ {selected.savingsPct}%</em>
-                  </div>
-                  <div>
-                    <small>Confidence</small>
-                    <strong>{selected.confidence}%</strong>
-                  </div>
-                </div>
-
-                <div className="aiRecommendationBox">
-                  <small>AI Recommendation</small>
-                  <p>{selected.aiRecommendation}</p>
-                </div>
-
-                <button type="button" className="runBtn selectBtn">
-                  Select Substitute →
-                </button>
-              </article>
-            ))}
+        {loading && (
+          <section className="panel liveResultsPanel">
+            <h2>Running Analysis</h2>
+            <p className="muted">
+              Agnes is computing hybrid similarity candidates, building ingredient profiles, and asking the
+              LLM to validate which substitutes work in this BOM.
+            </p>
           </section>
         )}
 
-        {closedRecommendations.length > 0 && (
-          <section className="recGrid">
-            {closedRecommendations.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={`recCard ${openIds.includes(item.id) ? 'active' : ''}`}
-                onClick={() => openRecommendation(item.id)}
-              >
-                <div className="recCardTop">
-                  <div>
-                    <h3>{item.name}</h3>
-                    <p>
-                      CAS {item.cas} • {item.formula}
-                    </p>
-                  </div>
-                  <div className="recScoreBlock">
-                    <span>Score</span>
-                    <strong>{item.score}</strong>
-                  </div>
-                </div>
-
-                <div className="recTags">
-                  {item.tags.map((tag) => (
-                    <span key={tag}>{tag}</span>
-                  ))}
-                </div>
-
-                <div className="recCardBottom">
-                  <span>
-                    {item.supplier} • {item.supplierLocation}
-                  </span>
-                  <strong>
-                    ${item.landedCost.toFixed(2)}/kg • ↓ {item.savingsPct}%
-                  </strong>
-                </div>
-              </button>
-            ))}
+        {missingSelection && (
+          <section className="panel liveResultsPanel errorPanel">
+            <h2>Missing Selection</h2>
+            <p className="muted">Go back and choose a product plus an ingredient before running the analysis.</p>
           </section>
+        )}
+
+        {error && !loading && !missingSelection && (
+          <section className="panel liveResultsPanel errorPanel">
+            <h2>Analysis Failed</h2>
+            <p className="muted">{error}</p>
+          </section>
+        )}
+
+        {!loading && result && !missingSelection && (
+          <>
+            {result.usedFallback && (
+              <section className="panel liveResultsPanel warningPanel">
+                <h2>Fallback Mode</h2>
+                <p className="muted">
+                  The live LLM response was unavailable, so the shortlist is currently based on hybrid
+                  similarity candidates. {result.llmError ? `Reason: ${result.llmError}` : ''}
+                </p>
+              </section>
+            )}
+
+            <section className="recHeader">
+              <div>
+                <h2>Validated Substitutes</h2>
+                <p>Shortlisted after hybrid clustering and contextual LLM validation</p>
+              </div>
+              <div className="recHeaderActions">
+                <span className="updatedNow">● {topSubstitutes.length} substitutes returned</span>
+              </div>
+            </section>
+
+            {topSubstitutes.length === 0 ? (
+              <section className="panel liveResultsPanel">
+                <h2>No Viable Substitutes</h2>
+                <p className="muted">
+                  The pipeline did not find any substitutes that passed the current similarity threshold and
+                  contextual validation for this BOM.
+                </p>
+              </section>
+            ) : (
+              <section className="substituteResultsGrid">
+                {topSubstitutes.map((substitute, index) => (
+                  <article key={`${substitute.name}-${index}`} className="substituteResultCard">
+                    <div className="substituteCardTop">
+                      <div>
+                        <small>Option {index + 1}</small>
+                        <h3>{substitute.name}</h3>
+                      </div>
+                      <div className="substituteConfidence">
+                        <span>Confidence</span>
+                        <strong>{substitute.confidenceScore}</strong>
+                      </div>
+                    </div>
+
+                    <div className="substituteMetricRow">
+                      <div className="substituteMetricChip">
+                        <span>Hybrid Similarity</span>
+                        <strong>{scorePercent(substitute.hybridSimilarity)}</strong>
+                      </div>
+                      <div className="substituteMetricChip">
+                        <span>SKU</span>
+                        <strong>{substitute.sku ?? 'Not resolved'}</strong>
+                      </div>
+                    </div>
+
+                    <p className="substituteReasoning">{substitute.reasoning}</p>
+                  </article>
+                ))}
+              </section>
+            )}
+
+            <section className="panel liveResultsPanel">
+              <h2>Cluster Candidates</h2>
+              <div className="clusterCandidateGrid">
+                {result.clusterCandidates.map((candidate) => (
+                  <div key={candidate.sku} className="clusterCandidateChip">
+                    <strong>{candidate.name}</strong>
+                    <span>{scorePercent(candidate.hybridSimilarity)}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
         )}
       </section>
     </main>

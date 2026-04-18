@@ -98,7 +98,8 @@ body {
 .dashboard:not(.resultsDashboard) .textInput,
 .dashboard:not(.resultsDashboard) .priorityCard,
 .dashboard:not(.resultsDashboard) .miniBlock,
-.dashboard:not(.resultsDashboard) .runInfoTile {
+.dashboard:not(.resultsDashboard) .runInfoTile,
+.dashboard:not(.resultsDashboard) .ingredientChip {
   background: #162843;
   border-color: #2d4f7f;
 }
@@ -156,6 +157,20 @@ body {
   border-color: #7fb0ff;
   background: #234573;
   box-shadow: 0 0 0 1px rgba(127, 176, 255, 0.35) inset;
+}
+
+.dashboard:not(.resultsDashboard) .ingredientChip.active {
+  border-color: #7fb0ff;
+  background: #234573;
+  box-shadow: 0 0 0 1px rgba(127, 176, 255, 0.35) inset;
+}
+
+.dashboard:not(.resultsDashboard) .ingredientChip.active strong {
+  color: #eef4ff;
+}
+
+.dashboard:not(.resultsDashboard) .ingredientChip.active span {
+  color: #9fb3d6;
 }
 
 .dashboard:not(.resultsDashboard) .runSection {
@@ -334,6 +349,11 @@ body {
   font-size: 1.05rem;
 }
 
+.selectInput {
+  appearance: none;
+  cursor: pointer;
+}
+
 .priorityGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -394,6 +414,140 @@ body {
   font-size: 1.04rem;
 }
 
+.selectedProductCard {
+  margin: 10px 0 18px;
+  border: 1px solid #315684;
+  border-radius: 16px;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(20, 33, 55, 0.96), rgba(15, 26, 43, 0.96)),
+    radial-gradient(circle at top right, rgba(127, 176, 255, 0.18), transparent 42%);
+  box-shadow: inset 0 1px 0 rgba(164, 196, 255, 0.08);
+}
+
+.selectedProductHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.selectedProductEyebrow {
+  margin: 0 0 6px;
+  color: #8fa7cf;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.74rem;
+}
+
+.selectedProductHeader h3 {
+  margin: 0;
+  color: #eef4ff;
+  font-size: 1.45rem;
+  letter-spacing: -0.02em;
+}
+
+.selectedProductBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid #4e78ad;
+  background: rgba(33, 58, 92, 0.8);
+  color: #dbe8ff;
+  font-size: 0.83rem;
+  white-space: nowrap;
+}
+
+.selectedProductMeta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.selectedProductCard .miniBlock {
+  background: rgba(19, 38, 64, 0.92);
+  border-color: #2d4f7f;
+}
+
+.selectedProductCard .miniBlock span {
+  color: #9fb3d6;
+}
+
+.selectedProductCard .miniBlock strong {
+  color: #eef4ff;
+}
+
+.ingredientOptions {
+  margin-top: 18px;
+}
+
+.ingredientSectionLabel {
+  color: #eef4ff;
+  margin-bottom: 12px;
+}
+
+.ingredientHelperText {
+  margin: 0 0 12px;
+  color: #9fb3d6;
+  font-size: 0.9rem;
+}
+
+.ingredientChipGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ingredientChip {
+  border: 1px solid #2d4f7f;
+  border-radius: 12px;
+  padding: 12px 13px;
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease,
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.ingredientChip strong {
+  color: #eef4ff;
+  font-size: 0.98rem;
+}
+
+.ingredientChip span {
+  color: #9fb3d6;
+  font-size: 0.79rem;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.ingredientChip:hover {
+  border-color: #5e8fd0;
+  background: #1a3050;
+  transform: translateY(-1px);
+}
+
+.ingredientChip.active {
+  border-color: #7cadf8;
+  background: #eef5ff;
+  box-shadow: 0 0 0 1px rgba(127, 176, 255, 0.35) inset;
+}
+
+.ingredientChip.active strong {
+  color: #0f172a;
+}
+
+.ingredientChip.active span {
+  color: #61728f;
+}
+
 .runSection {
   margin-top: 16px;
   border-top: 1px solid #dfe8fa;
@@ -412,6 +566,11 @@ body {
   cursor: pointer;
 }
 
+.runBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .runStatus {
   margin: 8px 0 0;
   font-size: 0.86rem;
@@ -420,6 +579,135 @@ body {
 
 .resultsDashboard {
   min-height: auto;
+}
+
+.liveResultsPanel {
+  margin-top: 16px;
+}
+
+.warningPanel {
+  border-color: #f1c96a;
+  background: linear-gradient(180deg, #fff8e5 0%, #fff2c9 100%);
+}
+
+.errorPanel {
+  border-color: #ef8f8f;
+  background: linear-gradient(180deg, #fff1f1 0%, #ffdede 100%);
+}
+
+.substituteResultsGrid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.substituteResultCard {
+  background: #ffffff;
+  border: 1px solid #d8e4fc;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 14px 30px rgba(31, 56, 114, 0.08);
+}
+
+.substituteCardTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.substituteCardTop small {
+  display: block;
+  margin-bottom: 6px;
+  color: #61728f;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.substituteCardTop h3 {
+  margin: 0;
+  color: #10203f;
+  font-size: 1.45rem;
+  letter-spacing: -0.02em;
+}
+
+.substituteConfidence {
+  min-width: 96px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #eef5ff;
+  border: 1px solid #c8d8f6;
+  text-align: right;
+}
+
+.substituteConfidence span {
+  display: block;
+  color: #61728f;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+
+.substituteConfidence strong {
+  color: #16398b;
+  font-size: 1.3rem;
+}
+
+.substituteMetricRow {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.substituteMetricChip {
+  border: 1px solid #d8e4fc;
+  border-radius: 12px;
+  background: #f8fbff;
+  padding: 11px 12px;
+}
+
+.substituteMetricChip span {
+  display: block;
+  color: #61728f;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+
+.substituteMetricChip strong {
+  color: #10203f;
+  font-size: 0.98rem;
+  word-break: break-word;
+}
+
+.substituteReasoning {
+  margin: 16px 0 0;
+  color: #30425f;
+  line-height: 1.55;
+}
+
+.clusterCandidateGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.clusterCandidateChip {
+  border: 1px solid #d8e4fc;
+  border-radius: 12px;
+  background: #f8fbff;
+  padding: 12px;
+  display: grid;
+  gap: 4px;
+}
+
+.clusterCandidateChip strong {
+  color: #10203f;
+}
+
+.clusterCandidateChip span {
+  color: #61728f;
 }
 
 .resultsHero {
