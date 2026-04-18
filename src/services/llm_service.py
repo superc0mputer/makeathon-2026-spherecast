@@ -4,6 +4,7 @@ import json
 from pydantic import BaseModel
 
 from src.models.recommendation_record import FinalDecisionResponse
+from src.models.phase2_context import Phase2Context
 from src.api_clients.gemini_client import GeminiClient
 
 class SubstituteItem(BaseModel):
@@ -28,28 +29,24 @@ class IngredientLLMClient:
         with open(full_path, "r", encoding="utf-8") as f:
             return f.read()
 
-    def get_substitutes(
-        self, 
-        target: str, 
-        cluster: str, 
-        bom: List[str], 
-        pubchem_components: str, 
-        fdc_nutritional_profile: str, 
-        candidates: List[str]
-    ) -> Dict[str, Any]:
+    def get_substitutes(self, context: Phase2Context) -> Dict[str, Any]:
         """
         Injects real values into the prompt template and calls Gemini,
-        asserting the output is strict JSON. Filters from the provided candidates list.
+        asserting the output is strict JSON. Evaluates against Chemical Profiles and overall BOM interactions.
         """
         template = self.load_prompt_template()
         
         # Inject context variables
-        prompt = template.replace("{{target_ingredient}}", target)
-        prompt = prompt.replace("{{product_cluster}}", cluster)
-        prompt = prompt.replace("{{bom_ingredients}}", ", ".join(bom))
-        prompt = prompt.replace("{{pubchem_components}}", pubchem_components)
-        prompt = prompt.replace("{{fdc_nutritional_profile}}", fdc_nutritional_profile)
-        prompt = prompt.replace("{{candidate_substitutes}}", ", ".join(candidates))
+        prompt = template.replace("{{target_ingredient}}", context.target_ingredient)
+        prompt = prompt.replace("{{product_cluster}}", context.product_cluster)
+        prompt = prompt.replace("{{target_profile}}", context.target_profile.model_dump_json(indent=2))
+        
+        # model_dump_json doesn't exist on Dict, so we dump mapping
+        bom_profiles_json = json.dumps({k: v.model_dump() for k, v in context.bom_profiles.items()}, indent=2)
+        candidate_profiles_json = json.dumps({k: v.model_dump() for k, v in context.candidate_profiles.items()}, indent=2)
+
+        prompt = prompt.replace("{{candidate_profiles}}", candidate_profiles_json)
+        prompt = prompt.replace("{{bom_profiles}}", bom_profiles_json)
 
         try:
             raw_response = self.client.generate_json_structured_content(

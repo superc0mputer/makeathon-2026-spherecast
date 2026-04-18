@@ -7,7 +7,7 @@ import re
 from typing import Any, Optional
 import dataclasses
 
-from src.models.chemical_profile import ChemicalProfile, ResolutionStatus
+from models.substitution.chemical_profile import ChemicalProfile, ResolutionStatus
 from src.services.cache_service import get_pubchem, set_pubchem
 from src.api_clients.pubchem_client import PubChemClient
 
@@ -246,31 +246,3 @@ def enrich_ingredient(
 
     return final_profile
 
-def enrich_pair(
-        name_a: str,
-        name_b: str,
-) -> tuple[ChemicalProfile, ChemicalProfile]:
-    profile_a = enrich_ingredient(name_a)
-    profile_b = enrich_ingredient(name_b)
-    return profile_a, profile_b
-
-def pair_to_llm_context(
-        profile_a: ChemicalProfile,
-        profile_b: ChemicalProfile,
-) -> dict[str, Any]:
-    same = profile_a.same_compound_as(profile_b)
-    return {
-        "ingredient_a": profile_a.to_llm_dict(),
-        "ingredient_b": profile_b.to_llm_dict(),
-        "same_compound": same,
-        "both_resolved": (
-                profile_a.status in {ResolutionStatus.RESOLVED, ResolutionStatus.AMBIGUOUS} and
-                profile_b.status in {ResolutionStatus.RESOLVED, ResolutionStatus.AMBIGUOUS}
-        ),
-        "chemical_context_note": (
-            "Both ingredients resolved to PubChem records."
-            if same is not None
-            else "One or both ingredients could not be resolved in PubChem — "
-                 "reason from ingredient names and BOM context alone."
-        ),
-    }
