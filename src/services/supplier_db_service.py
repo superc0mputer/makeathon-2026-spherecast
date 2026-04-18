@@ -4,7 +4,7 @@ import re
 import sqlite3
 from typing import Sequence, cast
 
-from src.models.supplier import SupplierRecord
+from src.models.supplier_record import SupplierRecord
 
 
 RAW_MATERIAL_SKU_RE = re.compile(r"^RM-[^-]+-(?P<slug>.+)-[0-9a-f]{8}$")

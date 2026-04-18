@@ -9,7 +9,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.models.supplier import SupplierRecord, SupplierRecordDict
+from src.models.supplier_record import SupplierRecord, SupplierRecordDict
 from src.services import (
     NominatimGeocoder,
     enrich_suppliers_with_geodata,

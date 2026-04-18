@@ -10,7 +10,7 @@ app = FastAPI(
 
 def load_prices() -> Dict[str, Any]:
     base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    db_path = os.path.join(base_path, "src", "data", "mock_database.json")
+    db_path = os.path.join(base_path, "src", "data", "mock_pricing_db.json")
     try:
         with open(db_path, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -41,4 +41,4 @@ def get_ingredient_price(ingredient_name: str):
     raise HTTPException(status_code=404, detail=f"Price not found for '{ingredient_name}'")
 
 # You can run this locally using:
-# uvicorn src.api.mintec_api:app --reload --port 8000
+# uvicorn src.api.mock_mintec_api:app --reload --port 8000
