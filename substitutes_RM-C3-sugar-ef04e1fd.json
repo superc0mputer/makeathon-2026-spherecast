@@ -1,0 +1,598 @@
+{
+  "target_sku": "RM-C3-sugar-ef04e1fd",
+  "total_viable_substitutes": 147,
+  "weights_used": {
+    "bom": 0.4,
+    "nutrition": 0.6
+  },
+  "substitutes": [
+    {
+      "sku": "RM-C58-sugar-117cb796",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C30-sugar-0bdf5d67",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C15-organic-stevia-extract-f10816df",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C27-stevia-leaf-extract-rebaudioside-a-7b086972",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C42-organic-stevia-673828e1",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C26-stevia-leaf-extract-40dbb2cc",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C20-organic-stevia-extract-leaf-e803f0cb",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C62-stevia-leaf-extract-646b040d",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C51-stevia-leaf-extract-5786cb50",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C23-stevia-25f8dd86",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C39-organic-stevia-5f6b93f5",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C56-organic-stevia-leaf-extract-rebaudioside-a-4b383f8d",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C7-stevia-or-sucralose-sweetener-a556c26e",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C27-natural-strawberry-flavor-6678e15f",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C17-sucrose-efa729e9",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C19-sucrose-c6abca6a",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C59-sorbitol-8ca4b855",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C17-sorbitol-fe5cb8ba",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C30-acacia-gum-fc79918e",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C8-xanthan-gum-e13cc7cd",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C38-xanthan-gum-67eb24ef",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C38-cellulose-gum-4260e588",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C20-organic-gum-acacia-17c541a3",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C61-xanthan-gum-aaef1463",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C39-xanthan-gum-65a01479",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C62-xanthan-gum-91be16c3",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C44-gellan-gum-b7fdbe7e",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C23-xanthan-gum-d9789f5b",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C5-xanthan-gum-7ff5328f",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C33-organic-gum-acacia-32c6f17e",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C6-xanthan-gum-ead6309f",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C9-cellulose-gum-86c049a5",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C17-gum-arabic-21ea5acf",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C19-gum-arabic-d8b5f627",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C6-cellulose-gum-fbd9bf21",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C62-gum-acacia-5116cd9c",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C39-cellulose-gum-04700a3c",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C11-rice-powder-3d1b7e08",
+      "similarity_score": 0.5994
+    },
+    {
+      "sku": "RM-C62-rice-powder-2b0b6431",
+      "similarity_score": 0.5994
+    },
+    {
+      "sku": "RM-C20-organic-tapioca-fiber-imo-efc511c2",
+      "similarity_score": 0.599
+    },
+    {
+      "sku": "RM-C58-tapioca-syrup-7b1d82e3",
+      "similarity_score": 0.599
+    },
+    {
+      "sku": "RM-C5-brown-rice-protein-f2127b74",
+      "similarity_score": 0.595
+    },
+    {
+      "sku": "RM-C30-rice-flour-947be4ee",
+      "similarity_score": 0.595
+    },
+    {
+      "sku": "RM-C57-rice-flour-110edd38",
+      "similarity_score": 0.595
+    },
+    {
+      "sku": "RM-C57-gelatin-7989e661",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C56-manganese-citrate-0b990e60",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C62-gelatin-f333c686",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C52-gelatin-capsule-d73cae98",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C56-zinc-citrate-45e7f827",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C50-gelatin-e04eefe9",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C58-gelatin-c50b9920",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C11-gelatin-capsule-bovine-42ef5483",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C19-gelatin-33f6d946",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C17-sodium-ascorbate-f4dc2885",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C15-sodium-citrate-2bb2e71f",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C30-gelatin-2e7ec9f6",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C37-gelatin-a40fdc3f",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C17-gelatin-45b7cd2c",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C31-gelatin-64baa1c8",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C62-sodium-citrate-b96411ba",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C28-softgel-capsule-bovine-gelatin-5a1a1582",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C14-gelatin-017eb28d",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C52-bone-gelatin-bovine-00801541",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C34-soft-gel-capsule-bovine-gelatin-7f9790b5",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C25-gelatin-121e19eb",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C24-softgel-bovine-gelatin-81674934",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C27-sodium-citrate-08487851",
+      "similarity_score": 0.5944
+    },
+    {
+      "sku": "RM-C36-cocoa-powder-99916811",
+      "similarity_score": 0.5939
+    },
+    {
+      "sku": "RM-C8-organic-cane-sugar-a6aae34c",
+      "similarity_score": 0.5903
+    },
+    {
+      "sku": "RM-C27-pure-cane-sugar-44f6c2d3",
+      "similarity_score": 0.5903
+    },
+    {
+      "sku": "RM-C62-cane-sugar-3a174aee",
+      "similarity_score": 0.5903
+    },
+    {
+      "sku": "RM-C15-organic-turmeric-75c7aa52",
+      "similarity_score": 0.589
+    },
+    {
+      "sku": "RM-C12-yellow-6-lake-d8d481af",
+      "similarity_score": 0.589
+    },
+    {
+      "sku": "RM-C2-d-alpha-tocopheryl-succinate-532e67fd",
+      "similarity_score": 0.5861
+    },
+    {
+      "sku": "RM-C37-dl-alpha-tocopheryl-acetate-50d2f8bd",
+      "similarity_score": 0.5861
+    },
+    {
+      "sku": "RM-C17-dl-alpha-tocopherol-68b372d5",
+      "similarity_score": 0.5861
+    },
+    {
+      "sku": "RM-C17-dl-alpha-tocopheryl-acetate-153b1b41",
+      "similarity_score": 0.5861
+    },
+    {
+      "sku": "RM-C39-organic-rice-dextrins-1576ca20",
+      "similarity_score": 0.5859
+    },
+    {
+      "sku": "RM-C2-rice-protein-c17ff51d",
+      "similarity_score": 0.5859
+    },
+    {
+      "sku": "RM-C52-black-pepper-concentrate-c4264fd8",
+      "similarity_score": 0.5853
+    },
+    {
+      "sku": "RM-C17-dl-tartaric-acid-d0c76b57",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C51-malic-acid-ba710486",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C17-folic-acid-6c8e8f26",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C59-dl-tartaric-acid-03e26fb5",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C59-folic-acid-b94e91e8",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C30-stearic-acid-19acfab5",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C30-citric-acid-d939ac85",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C17-sorbic-acid-c99fcf34",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C51-citric-acid-b71ce960",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C41-citric-acid-1ace1f97",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C62-citric-acid-1bf7cf36",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C27-citric-acid-22adab04",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C19-stearic-acid-3d5eb908",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C10-citric-acid-8159ad4e",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C26-citric-acid-fa037e6f",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C1-stearic-acid-9a014700",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C58-lactic-acid-24bdbce4",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C2-para-amino-benzoic-acid-b19c9ed7",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C57-magnesium-amino-acid-chelate-9d18d641",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C52-boron-amino-acid-chelate-bddb269c",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C16-citric-acid-67e2da70",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C15-non-gmo-citric-acid-7638d213",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C56-malic-acid-6d696fa8",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C52-stearic-acid-bc04499f",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C37-stearic-acid-8fe47daa",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C48-vegetable-stearic-acid-c62355d9",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C55-stearic-acid-3a1ca9f9",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C40-citric-acid-c97d12d1",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C37-folic-acid-2bb2a34c",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C56-citric-acid-d55c874f",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C62-stearic-acid-29ed75dd",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C57-vegetable-stearic-acid-d0876531",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C58-citric-acid-37ade881",
+      "similarity_score": 0.581
+    },
+    {
+      "sku": "RM-C40-l-valine-237d9405",
+      "similarity_score": 0.5809
+    },
+    {
+      "sku": "RM-C40-l-isoleucine-fc3f6810",
+      "similarity_score": 0.5809
+    },
+    {
+      "sku": "RM-C40-l-leucine-dc251fa2",
+      "similarity_score": 0.5809
+    },
+    {
+      "sku": "RM-C30-iron-411b5c14",
+      "similarity_score": 0.5667
+    },
+    {
+      "sku": "RM-C55-iron-glycinate-6ef778b3",
+      "similarity_score": 0.5667
+    },
+    {
+      "sku": "RM-C60-iron-99cff33a",
+      "similarity_score": 0.5667
+    },
+    {
+      "sku": "RM-C14-iron-1f8c0d39",
+      "similarity_score": 0.5667
+    },
+    {
+      "sku": "RM-C62-iron-ce69dcf7",
+      "similarity_score": 0.5667
+    },
+    {
+      "sku": "RM-C62-natural-and-artificial-flavors-8d2408fe",
+      "similarity_score": 0.5661
+    },
+    {
+      "sku": "RM-C38-natural-and-artificial-flavors-fbca0d45",
+      "similarity_score": 0.5661
+    },
+    {
+      "sku": "RM-C43-natural-and-artificial-flavors-5df885b2",
+      "similarity_score": 0.5661
+    },
+    {
+      "sku": "RM-C38-artificial-flavor-66466071",
+      "similarity_score": 0.5661
+    },
+    {
+      "sku": "RM-C9-natural-and-artificial-flavors-0702b8aa",
+      "similarity_score": 0.5661
+    },
+    {
+      "sku": "RM-C6-artificial-flavor-abc70ce1",
+      "similarity_score": 0.5661
+    },
+    {
+      "sku": "RM-C18-natural-and-artificial-flavors-0e9a8451",
+      "similarity_score": 0.5661
+    },
+    {
+      "sku": "RM-C61-artificial-flavors-1a59971a",
+      "similarity_score": 0.5661
+    },
+    {
+      "sku": "RM-C41-natural-and-artificial-flavors-9b95de33",
+      "similarity_score": 0.5661
+    },
+    {
+      "sku": "RM-C56-coloring-concentrates-92216482",
+      "similarity_score": 0.5582
+    },
+    {
+      "sku": "RM-C17-starch-2edb910e",
+      "similarity_score": 0.5552
+    },
+    {
+      "sku": "RM-C30-starch-883b427a",
+      "similarity_score": 0.5552
+    },
+    {
+      "sku": "RM-C62-starch-5debaa10",
+      "similarity_score": 0.5552
+    },
+    {
+      "sku": "RM-C30-modified-food-starch-961c9833",
+      "similarity_score": 0.5552
+    },
+    {
+      "sku": "RM-C59-sodium-starch-glycolate-c3fc22e9",
+      "similarity_score": 0.5552
+    },
+    {
+      "sku": "RM-C62-pea-starch-b6c86033",
+      "similarity_score": 0.5552
+    },
+    {
+      "sku": "RM-C59-starch-8ddef958",
+      "similarity_score": 0.5552
+    },
+    {
+      "sku": "RM-C17-sodium-starch-glycolate-027c1542",
+      "similarity_score": 0.5552
+    },
+    {
+      "sku": "RM-C39-organic-inulin-b5d7a6d9",
+      "similarity_score": 0.5548
+    },
+    {
+      "sku": "RM-C20-organic-erythritol-7dc0aad5",
+      "similarity_score": 0.5548
+    },
+    {
+      "sku": "RM-C39-organic-erythritol-5e3cd183",
+      "similarity_score": 0.5548
+    },
+    {
+      "sku": "RM-C33-organic-maltodextrin-3279a920",
+      "similarity_score": 0.5548
+    },
+    {
+      "sku": "RM-C39-organic-acacia-a1a4fd61",
+      "similarity_score": 0.5548
+    },
+    {
+      "sku": "RM-C5-cinnamon-28c1b925",
+      "similarity_score": 0.5509
+    },
+    {
+      "sku": "RM-C2-rice-bran-1f905661",
+      "similarity_score": 0.55
+    },
+    {
+      "sku": "RM-C5-pea-protein-4369ae6b",
+      "similarity_score": 0.5156
+    }
+  ]
+}
