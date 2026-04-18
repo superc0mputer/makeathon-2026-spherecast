@@ -207,3 +207,16 @@ marimo/_lsp/
 __marimo__/
 .DS_Store
 .vscode/settings.json
+.idea/data_source_mapping.xml
+.idea/dataSources.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/makeathon-2026-spherecast.iml
+.idea/misc.xml
+.idea/sqldialects.xml
+.idea/vcs.xml
+.idea/dataSources.local.xml
+.idea/dataSources/data_sources_history.xml
+.idea/dataSources/ec88f9ab-3ca8-4feb-bcc6-65d222117df6.xml
+.idea/dataSources/ec88f9ab-3ca8-4feb-bcc6-65d222117df6/storage_v2/_src_/schema/main.uQUzAA.meta
+.idea/workspace.xml
