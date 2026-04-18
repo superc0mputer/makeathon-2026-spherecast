@@ -7,11 +7,19 @@ from typing import Type
 class GeminiClient:
     """Client for Google Gemini LLM API"""
     def __init__(self, api_key: str = None, model_name: str = "gemini-2.5-flash", project_id: str = None, location: str = "us-central1"):
+        # Always use Vertex AI backend so calls can use Google Cloud billing.
+        client_kwargs = {"vertexai": True, "location": location}
         if project_id:
-            # We use Vertex AI backend instead of free-tier AI Studio
-            self.client = genai.Client(vertexai=True, project=project_id, location=location)
-        else:
-            self.client = genai.Client(api_key=api_key)
+            client_kwargs["project"] = project_id
+        if api_key:
+            client_kwargs["api_key"] = api_key
+
+        if not project_id and not api_key:
+            raise ValueError(
+                "Missing authentication. Provide project_id (ADC flow) or api_key (Vertex API key flow)."
+            )
+
+        self.client = genai.Client(**client_kwargs)
         self.model_name = model_name
 
     def generate_json_structured_content(
@@ -33,7 +41,7 @@ class GeminiClient:
             )
         )
         
-        raw_response = response.text.strip()
+        raw_response = (response.text or "").strip()
         # Clean markdown wrappers if present
         if raw_response.startswith("```json"):
             raw_response = raw_response.replace("```json", "", 1)

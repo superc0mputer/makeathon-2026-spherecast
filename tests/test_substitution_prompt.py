@@ -10,78 +10,92 @@ warnings.filterwarnings("ignore")
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.services.llm_service import IngredientLLMClient
+from src.models.biochemical_context import BiochemicalContext
+from src.models.substitution.full_ingredient_profile import FullIngredientProfile
 
 def test_ingredients():
     """
     Test the Phase 2, Step 3 LLM Prompt substitution logic using 3 representative ingredients.
     This checks whether the LLM handles BOM context, chemical matching, and strict JSON rendering.
     """
-    # Use simple API key instead of complex Vertex billing 
-    api_key = os.environ.get("GEMINI_API_KEY", "your-api-key-here")
+    vertex_project = os.environ.get("VERTEX_PROJECT_ID")
+    vertex_location = os.environ.get("VERTEX_LOCATION", "us-central1")
     
     print("\n--- Testing Ingredient Substitution LLM ---")
     
-    # Mocks based on the product cluster and BOM requirements
-    test_cases = [
-        {
-            "target": "Sugar",
-            "cluster": "Baked Goods (Sponge Cake)",
-            "bom": ["All-purpose flour", "Eggs", "Butter", "Vanilla extract", "Baking powder"],
-            "pubchem_components": "Sucrose; C12H22O11; provides sweetness, caramelization, moisture retention, and structural bulking; melting point ~186°C.",
-            "candidates": ["Allulose", "Erythritol", "Table Salt (Sodium Chloride)", "Sand"] 
-        },
-        {
-            "target": "Palm Oil",
-            "cluster": "Chocolate Confectionery",
-            "bom": ["Cocoa Powder", "Milk Powder", "Lecithin", "Sugar"],
-            "pubchem_components": "High saturated fat content (palmitic acid); semi-solid at room temperature; neutral flavor; provides mouthfeel and snap; melting point ~35°C.",
-            "candidates": ["Shea Butter", "Motor Oil", "Sal Fat", "Water"]
-        },
-        {
-            "target": "Guar Gum",
-            "cluster": "Almond Milk Alternative",
-            "bom": ["Filtered Water", "Almond Paste", "Sea Salt", "Calcium Carbonate"],
-            "pubchem_components": "Galactomannan polysaccharide; high viscosity thickener and emulsifier; highly soluble in cold water; pH independent stabilization.",
-            "candidates": ["Xanthan Gum", "Locust Bean Gum", "Baking Soda"]
-        }
-    ]
+    if not vertex_project:
+        print("\n[ERROR] Missing VERTEX_PROJECT_ID. Example:")
+        print("export VERTEX_PROJECT_ID=agnes-ui")
+        return
+
+    # Keep this to one case so test stays cheap.
+    test_case = {
+        "target": "Sodium Benzoate",
+        "cluster": "Beverage Concentrate",
+        "bom": ["Citric Acid", "Water", "Flavor Base"],
+        "candidates": ["Potassium Sorbate", "Calcium Propionate", "Sodium Acetate"],
+    }
+
+    def mk_profile(name: str, formula: str, role: str) -> FullIngredientProfile:
+        return FullIngredientProfile(
+            chemical_properties={
+                "name": name,
+                "molecular_formula": formula,
+                "functional_role": role,
+            }
+        )
 
     try:
-        client = IngredientLLMClient(api_key=api_key if api_key != "your-api-key-here" else None)
-        
-        for i, test in enumerate(test_cases, 1):
-            print(f"\n[Test Case {i}] Finding substitutes for: {test['target']}")
-            print(f"Context: Cluster='{test['cluster']}', BOM={test['bom']}")
-            print(f"Provided Candidates: {test['candidates']}")
-            
-            result = client.get_substitutes(
-                target=test["target"],
-                cluster=test["cluster"],
-                bom=test["bom"],
-                pubchem_components=test["pubchem_components"],
-                candidates=test["candidates"]
-            )
-            
-            if "error" in result:
-                print(f"❌ LLM Call Failed. Check your Vertex AI permissions or quota. Error: {result['error']}")
-                continue
-                
-            # Verify required JSON scheme structure
-            if "substitutes" in result and isinstance(result["substitutes"], list):
-                print("✅ Successfully generated JSON structure!")
-                for sub in result["substitutes"]:
-                    name = sub.get("substitute_name", "Unknown")
-                    confidence = sub.get("confidence_score", "N/A")
-                    reasoning = sub.get("reasoning", "No reasoning provided")
-                    print(f"  -> {name} [Confidence: {confidence}%]")
-                    print(f"     Reasoning: {reasoning}")
-            else:
-                print("❌ Invalid output structure from LLM.")
-                print(json.dumps(result, indent=2))
+        client = IngredientLLMClient(
+            project_id=vertex_project,
+            location=vertex_location,
+        )
+
+        context = BiochemicalContext(
+            target_ingredient=test_case["target"],
+            product_cluster=test_case["cluster"],
+            target_profile=mk_profile(
+                "Sodium Benzoate",
+                "C7H5NaO2",
+                "Preservative",
+            ),
+            bom_profiles={
+                "Citric Acid": mk_profile("Citric Acid", "C6H8O7", "Acidulant"),
+                "Water": mk_profile("Water", "H2O", "Solvent"),
+                "Flavor Base": mk_profile("Flavor Base", "Mixture", "Flavor"),
+            },
+            candidate_profiles={
+                "Potassium Sorbate": mk_profile("Potassium Sorbate", "C6H7KO2", "Preservative"),
+                "Calcium Propionate": mk_profile("Calcium Propionate", "C6H10CaO4", "Preservative"),
+                "Sodium Acetate": mk_profile("Sodium Acetate", "C2H3NaO2", "Buffer"),
+            },
+        )
+
+        print(f"\n[Test Case] Finding substitutes for: {test_case['target']}")
+        print(f"Context: Cluster='{test_case['cluster']}', BOM={test_case['bom']}")
+        print(f"Provided Candidates: {test_case['candidates']}")
+
+        result = client.get_substitutes(context=context)
+
+        if "error" in result:
+            print(f"❌ LLM Call Failed. Check Vertex setup/quota. Error: {result['error']}")
+            return
+
+        if "substitutes" in result and isinstance(result["substitutes"], list):
+            print("✅ Successfully generated JSON structure!")
+            for sub in result["substitutes"]:
+                name = sub.get("substitute_name", "Unknown")
+                confidence = sub.get("confidence_score", "N/A")
+                reasoning = sub.get("reasoning", "No reasoning provided")
+                print(f"  -> {name} [Confidence: {confidence}%]")
+                print(f"     Reasoning: {reasoning}")
+        else:
+            print("❌ Invalid output structure from LLM.")
+            print(json.dumps(result, indent=2))
                 
     except Exception as e:
         print(f"\n[ERROR] Initializing client failed: {e}")
-        print("Please ensure you have `google-cloud-aiplatform` installed and `gcloud auth application-default login` executed.")
+        print("Please ensure `VERTEX_PROJECT_ID` is set and `gcloud auth application-default login` is completed.")
 
 if __name__ == "__main__":
     test_ingredients()
