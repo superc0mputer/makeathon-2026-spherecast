@@ -1,0 +1,26 @@
+{
+  "target_sku": "RM-C6-sucralose-792c37c8",
+  "total_viable_substitutes": 463,
+  "substitutes": [
+    {
+      "sku": "RM-C43-sucralose-34d90dd1",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C62-sucralose-c98ea80a",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C36-sucralose-d02d5b0f",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C38-sucralose-ea50c9df",
+      "similarity_score": 0.6
+    },
+    {
+      "sku": "RM-C40-sucralose-23b7e87e",
+      "similarity_score": 0.6
+    }
+  ]
+}

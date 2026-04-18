@@ -27,11 +27,11 @@ from src.services.pubchem_service import enrich_ingredient
 DEFAULT_DB = "db.sqlite"
 MIN_SIMILARITY = 0.40
 
-# Using the updated weights from your stashed changes
-WEIGHT_BOM = 0.2
-WEIGHT_CHEM = 0.3
-WEIGHT_FDC = 0.5
 
+WEIGHT_BOM = 0.20
+WEIGHT_CHEM = 0.25
+WEIGHT_FDC = 0.35
+WEIGHT_TEXT = 0.20
 
 def load_data(db_path: str) -> pd.DataFrame:
     con = sqlite3.connect(db_path)
@@ -74,8 +74,11 @@ def calculate_target_substitutes(components: pd.DataFrame, target_sku: str) -> d
 
     target_idx = np.where(ingredient_skus == target_sku)[0][0]
 
-    # BOM Similarities (Raw Co-occurrence)
-    co_occurrence = np.dot(binary_bom_matrix.T, binary_bom_matrix)
+    # BOM Similarities
+    tfidf = TfidfTransformer(norm='l2')
+    bom_matrix = tfidf.fit_transform(binary_bom_matrix).toarray()
+    co_occurrence = np.dot(bom_matrix.T, bom_matrix)
+
     np.fill_diagonal(co_occurrence, 0)
 
     target_context = co_occurrence[target_idx].reshape(1, -1)
@@ -104,10 +107,11 @@ def calculate_target_substitutes(components: pd.DataFrame, target_sku: str) -> d
 
     names_mapped = [ingredient_name_from_sku(sku) for sku in ingredient_skus]
 
+    
     for i, name in enumerate(names_mapped):
         if i % 25 == 0 or i == len(names_mapped) - 1:
-            print(f"        ...fetching profile {i + 1}/{len(names_mapped)}: {name} (can be slow without cache)")
-
+            print(f"        ...fetching profile {i+1}/{len(names_mapped)}: {name} (can be slow without cache)")
+            
         # PubChem
         profile = enrich_ingredient(name)
         chem_vec = [
@@ -157,12 +161,35 @@ def calculate_target_substitutes(components: pd.DataFrame, target_sku: str) -> d
         fdc_sim_scores = cosine_similarity(target_fdc, fdc_norm)[0]
     else:
         fdc_sim_scores = np.zeros(len(ingredient_skus))
+        
+    import difflib
+    text_sim_scores = np.zeros(len(ingredient_skus))
+    
+    target_chem_raw_sum = np.sum(np.abs(chem_matrix[target_idx]))
+    target_fdc_raw_sum = np.sum(np.abs(fdc_matrix[target_idx]))
+    
+    target_name_normalized = names_mapped[target_idx].lower()
+
+    # Penalize "similarity by absence" and score text
+    for j in range(len(ingredient_skus)):
+        # 1. Text Similarity Score
+        seq = difflib.SequenceMatcher(None, target_name_normalized, names_mapped[j].lower())
+        text_sim_scores[j] = seq.ratio()
+        
+        # 2. Absence Penalty (if target OR candidate lacks data entirely, zero out the similarity)
+        if target_chem_raw_sum == 0.0 or np.sum(np.abs(chem_matrix[j])) == 0.0:
+            chem_sim_scores[j] = 0.0
+            
+        if target_fdc_raw_sum == 0.0 or np.sum(np.abs(fdc_matrix[j])) == 0.0:
+            fdc_sim_scores[j] = 0.0
 
     # Apply Weights
     final_hybrid_scores = (
-            (bom_sim_scores * WEIGHT_BOM) +
-            (chem_sim_scores * WEIGHT_CHEM) +
-            (fdc_sim_scores * WEIGHT_FDC)
+
+        (bom_sim_scores * WEIGHT_BOM) + 
+        (chem_sim_scores * WEIGHT_CHEM) + 
+        (fdc_sim_scores * WEIGHT_FDC) +
+        (text_sim_scores * WEIGHT_TEXT)
     )
 
     print("      Applying Biochemical Ontology Filter (Class vs. Component)...")

@@ -1,0 +1,26 @@
+{
+  "target_sku": "RM-C14-b-vitamins-6b1105ff",
+  "total_viable_substitutes": 154,
+  "substitutes": [
+    {
+      "sku": "RM-C13-b-vitamins-00134c85",
+      "similarity_score": 0.7
+    },
+    {
+      "sku": "RM-C52-b-vitamins-a8a22ae9",
+      "similarity_score": 0.7
+    },
+    {
+      "sku": "RM-C33-b-vitamins-3aef7be4",
+      "similarity_score": 0.7
+    },
+    {
+      "sku": "RM-C7-b-vitamins-d6188591",
+      "similarity_score": 0.7
+    },
+    {
+      "sku": "RM-C25-b-vitamins-46e3c4f9",
+      "similarity_score": 0.7
+    }
+  ]
+}
