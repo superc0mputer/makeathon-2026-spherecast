@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import { NextRequest, NextResponse } from 'next/server'
 
-const dbPath = path.resolve(process.cwd(), '..', '..', 'db.sqlite')
+const dbPath = path.resolve(process.cwd(), '..', '..', 'db', 'db.sqlite')
 
 const pythonScript = `
 import json
