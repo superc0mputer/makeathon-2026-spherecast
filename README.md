@@ -1,6 +1,6 @@
 # makeathon-2026-spherecast
 
-# 🔄 Smart Ingredient Substitution Pipeline
+# 🔄 Smart Ingredient Substitution Pipeline & UI
 
 **Overview**
 This pipeline automates the process of finding viable, cost-effective, and low-risk substitute ingredients for our manufacturing process. It leverages chemical databases, supplier logistics, and LLM-driven analysis to recommend the best alternatives.
@@ -62,10 +62,57 @@ This pipeline automates the process of finding viable, cost-effective, and low-r
 
 ---
 
-### 💻 Final Output / Deliverable
-The backend will serve exactly 3 objects following the `FinalDecisionResponse` Pydantic schema to the frontend, which will render a **Clean UI Dashboard**. 
+## 🛠 Setup & Installation
 
-The UI must highlight the **Top 3 Choices**, displaying:
-1.  The recommended substitute ingredient.
-2.  The optimal supplier (along with price and transit distance).
-3.  A brief LLM-generated summary of *why* it was chosen (highlighting exact supply chain metrics, supplier consolidation, cost, distance, and chemical confidence score).
+Below are the steps to get the environment and UI running on your machine.
+
+### 1. Requirements
+*   Python 3.10+
+*   Node.js 20+
+
+### 2. Configure Environment (`.env`)
+First, create an environment variable file (`.env`) in the root directory. You must supply valid API keys to function properly without rate-limiting.
+
+```bash
+cp .env.example .env
+```
+
+If `.env.example` doesn't exist, create `.env` manually:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+FDC_API_KEY=your_fdc_api_key_here
+```
+
+### 3. Setup Python Backend
+Create a virtual environment and install the required dependencies.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 4. Start the Application UI
+Open a new terminal session, navigate to the frontend directory, install dependencies, and start the development server.
+
+```bash
+cd frontend/agnes-ui
+npm install
+npm run dev
+```
+Navigate to `http://localhost:3000` to interact with the pipeline via the dashboard.
+
+---
+
+## 🐳 Running with Docker (Alternative)
+
+If you prefer an isolated container to run both the Python pipeline and Node.js UI instantly:
+
+1. **Ensure you've created your `.env` file** at the project root as described above.
+2. Run the helper bash script:
+
+```bash
+./run_docker.sh
+```
+
+It will build the image and start the Next.js UI on port 3000. It also automatically maps the `./db` folder to preserve API caching between restarts!
