@@ -68,6 +68,11 @@ function summarizeFallbackReason(message: string | null) {
   return message
 }
 
+function capitalizeFirstLetter(str: string) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // 1. Rename your original component to ResultsContent (or similar)
 function ResultsContent() {
   const router = useRouter()
@@ -172,7 +177,7 @@ function ResultsContent() {
           </div>
 
           <h1>
-            Finding substitutes for <span>{result?.targetIngredient.name ?? 'selected ingredient'}</span>
+            Finding substitutes for <span>{capitalizeFirstLetter(result?.targetIngredient.name ?? 'selected ingredient')}</span>
           </h1>
           <p>
             This run combines hybrid substitute discovery, profile enrichment, and contextual LLM
@@ -192,7 +197,7 @@ function ResultsContent() {
             </article>
             <article className="runInfoTile">
               <small>Target Ingredient</small>
-              <strong>{result?.targetIngredient.name ?? 'Loading...'}</strong>
+              <strong>{capitalizeFirstLetter(result?.targetIngredient.name ?? 'Loading...')}</strong>
               <span>{result?.targetIngredient.sku ?? 'Waiting for ingredient info'}</span>
             </article>
             <article className="runInfoTile">
@@ -271,7 +276,14 @@ function ResultsContent() {
                           <div className="substituteCardTop">
                             <div>
                               <small>{substitute.rank ? `Rank ${substitute.rank}` : `Option ${index + 1}`}</small>
-                              <h3>{substitute.name}</h3>
+                              <h3>
+                                {capitalizeFirstLetter(substitute.name)}
+                                {substitute.recommendedSupplier && (
+                                  <span className="recommendedSupplierHighlight">
+                                    {' '}— by {capitalizeFirstLetter(substitute.recommendedSupplier.name)}
+                                  </span>
+                                )}
+                              </h3>
                             </div>
                             <div className="substituteConfidence">
                               <span>Confidence</span>
@@ -296,6 +308,12 @@ function ResultsContent() {
                                 {substitute.supplierCount ?? 0}
                               </strong>
                             </div>
+                            {substitute.recommendedSupplier && (
+                                <div className="substituteMetricChip">
+                                  <span>Recommended Supplier</span>
+                                  <strong>{substitute.recommendedSupplier.name}</strong>
+                                </div>
+                            )}
                           </div>
 
                           <p className="substituteReasoning">

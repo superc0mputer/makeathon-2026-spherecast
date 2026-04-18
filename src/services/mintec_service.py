@@ -7,6 +7,7 @@ from typing import Dict, Any, List
 from src.models.supplier_record import SupplierRecord
 from src.services.nominatim_service import NominatimGeocoder, enrich_suppliers_with_geodata
 from src.api_clients.mintec_client import MintecClient
+from src.services.cache_service import get_mintec
 
 class SupplyChainEnricher:
     def __init__(self, db_path: str = "db/db.sqlite", mintec_api_url: str = "http://127.0.0.1:8000/api/v1/prices"):
@@ -52,6 +53,9 @@ class SupplyChainEnricher:
         Uses the MintecClient to query our actual running FastAPI Mintec Mock 
         API. Fails over silently so the pipeline doesn't break if the API isn't booted.
         """
+        price_info = get_mintec(ingredient_name)
+        if price_info:
+            return price_info.get("price_per_kg")
         return self.mintec_client.fetch_price(ingredient_name)
 
     def enrich_substitutes(self, llm_response: Dict[str, Any], company_coords: tuple[float, float] = (48.1351, 11.5820)) -> Dict[str, Any]:

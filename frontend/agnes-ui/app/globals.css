@@ -1837,3 +1837,4 @@ body {
 .resultsDashboard .detailCard .runBtn {
   color: #ffffff;
 }
+.recommendedSupplierHighlight { color: var(--accent-blue, #2196f3); font-weight: 600; padding: 0.1em 0.3em; background: rgba(33, 150, 243, 0.1); border-radius: 4px; font-size: 0.9em; }
