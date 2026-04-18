@@ -26,6 +26,9 @@ We architected a 4-phase generative pipeline that bridges **deterministic featur
 *   **Enterprise Vector Database:** Replace local in-memory cosine similarity logic with an embedded Vector Database (e.g., Milvus or Pinecone) to allow for instant, massively scalable nearest-neighbor clustering.
 *   **Live SaaS Pricing Integration:** Replace our currently mocked Local API environment with live, authenticated calls to Mintec or another live commodities index.
 
+
+## ⚙️ Implementation Details
+
 **Overview**
 This pipeline automates the process of finding viable, cost-effective, and low-risk substitute ingredients for a manufacturing process of a company. It leverages chemical databases, supplier logistics, and LLM-driven analysis to recommend the best alternatives.
 
