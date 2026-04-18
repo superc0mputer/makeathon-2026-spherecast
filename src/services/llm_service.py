@@ -2,10 +2,9 @@ import os
 from typing import Dict, Any, List
 import json
 from pydantic import BaseModel
-from google import genai
-from google.genai import types
 
 from src.models.recommendation_record import FinalDecisionResponse
+from src.api_clients.gemini_client import GeminiClient
 
 class SubstituteItem(BaseModel):
     substitute_name: str
@@ -18,10 +17,9 @@ class SubstituteResponse(BaseModel):
 class IngredientLLMClient:
     def __init__(self, api_key: str = None, model_name: str = "gemini-2.5-flash"):
         """
-        Initializes the client using Google AI Studio API Key.
+        Initializes the LLM orchestrated client.
         """
-        self.client = genai.Client(api_key=api_key)
-        self.model_name = model_name
+        self.client = GeminiClient(api_key=api_key, model_name=model_name)
 
     def load_prompt_template(self, prompt_path: str = "prompts/substitution_v1.prompt.txt") -> str:
         """Loads the version-controlled prompt template from disk."""
@@ -54,23 +52,13 @@ class IngredientLLMClient:
         prompt = prompt.replace("{{candidate_substitutes}}", ", ".join(candidates))
 
         try:
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    temperature=0.2,
-                    response_mime_type="application/json",
-                    response_schema=SubstituteResponse,
-                    system_instruction="You are a Professional Food Science and Chemical Engineering Analyst."
-                )
+            raw_response = self.client.generate_json_structured_content(
+                prompt=prompt,
+                response_schema=SubstituteResponse,
+                system_instruction="You are a Professional Food Science and Chemical Engineering Analyst.",
+                temperature=0.2
             )
-            raw_response = response.text.strip()
-            if raw_response.startswith("```json"):
-                raw_response = raw_response.replace("```json", "", 1)
-                if raw_response.endswith("```"):
-                    raw_response = raw_response[:-3]
-            
-            return json.loads(raw_response.strip())
+            return json.loads(raw_response)
         except Exception as e:
             print(f"Error calling Gemini via genai: {e}")
             return {"error": str(e)}
@@ -97,23 +85,13 @@ class IngredientLLMClient:
         prompt = prompt.replace("{{enriched_data}}", json.dumps(enriched_data, indent=2))
         
         try:
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    temperature=0.2, # Low temperature since evaluation needs rigor
-                    response_mime_type="application/json",
-                    response_schema=FinalDecisionResponse,
-                    system_instruction="You are a strict Data Scientist ranking supply chain constraints."
-                )
+            raw_response = self.client.generate_json_structured_content(
+                prompt=prompt,
+                response_schema=FinalDecisionResponse,
+                system_instruction="You are a strict Data Scientist ranking supply chain constraints.",
+                temperature=0.2
             )
-            raw_response = response.text.strip()
-            if raw_response.startswith("```json"):
-                raw_response = raw_response.replace("```json", "", 1)
-                if raw_response.endswith("```"):
-                    raw_response = raw_response[:-3]
-            
-            return json.loads(raw_response.strip())
+            return json.loads(raw_response)
         except Exception as e:
             print(f"Error executing Recommendation LLM call: {e}")
             return {"error": str(e)}

@@ -17,7 +17,7 @@ from src.services.clustering_service import load_data, calculate_target_substitu
 from src.services.supplier_db_service import ingredient_name_from_sku
 from src.services.pubchem_service import enrich_ingredient
 from src.services.llm_service import IngredientLLMClient
-from src.services.enrichment_service import SupplyChainEnricher
+from src.services.mintec_service import SupplyChainEnricher
 from src.services.fdc_service import fetch_fdc_profiles
 
 def main():

@@ -1,12 +1,11 @@
 import requests
 from typing import Dict, Any, List
 from src.services.cache_service import get_fdc, set_fdc
+from src.api_clients.fdc_client import FDCClient
 
 class FDCService:
     def __init__(self, api_key: str = None):
-        # Fallback to DEMO_KEY if no key is provided, which works but has strict rate limits
-        self.api_key = api_key or "DEMO_KEY"
-        self.base_url = "https://api.nal.usda.gov/fdc/v1"
+        self.client = FDCClient(api_key=api_key)
 
     def get_nutritional_profile(self, ingredient_name: str, max_age_days: int = None) -> Dict[str, Any]:
         """
@@ -17,18 +16,8 @@ class FDCService:
         if cached_data:
             return cached_data
 
-        url = f"{self.base_url}/foods/search"
-        params = {
-            "query": ingredient_name,
-            "pageSize": 1,
-            "api_key": self.api_key,
-            "dataType": "Foundation,SR Legacy,Branded" # Focus on primary data types
-        }
-        
         try:
-            response = requests.get(url, params=params, timeout=10)
-            response.raise_for_status()
-            data = response.json()
+            data = self.client.search_food(ingredient_name)
             
             if not data.get("foods"):
                 result = {"status": "not_found", "message": f"No FDC data found for {ingredient_name}"}
