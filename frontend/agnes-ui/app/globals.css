@@ -63,6 +63,115 @@ body {
   box-shadow: 0 20px 48px rgba(2, 8, 20, 0.36);
 }
 
+/* Darker palette for the first page only */
+.dashboard:not(.resultsDashboard) {
+  background: linear-gradient(165deg, #111a2d 0%, #0c1423 100%);
+  border-color: #233a5f;
+  color: #dbe8ff;
+}
+
+.dashboard:not(.resultsDashboard) .agentRunCard {
+  border-color: #27456f;
+  background:
+    linear-gradient(180deg, rgba(21, 33, 54, 0.98), rgba(16, 27, 46, 0.98)),
+    repeating-linear-gradient(
+      to right,
+      rgba(130, 160, 210, 0.16) 0,
+      rgba(130, 160, 210, 0.16) 1px,
+      transparent 1px,
+      transparent 42px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(130, 160, 210, 0.16) 0,
+      rgba(130, 160, 210, 0.16) 1px,
+      transparent 1px,
+      transparent 42px
+    );
+}
+
+.dashboard:not(.resultsDashboard) .panel {
+  background: #121f35;
+  border-color: #27456f;
+}
+
+.dashboard:not(.resultsDashboard) .textInput,
+.dashboard:not(.resultsDashboard) .priorityCard,
+.dashboard:not(.resultsDashboard) .miniBlock,
+.dashboard:not(.resultsDashboard) .runInfoTile {
+  background: #162843;
+  border-color: #2d4f7f;
+}
+
+.dashboard:not(.resultsDashboard) .topbar {
+  border-bottom-color: #27456f;
+}
+
+.dashboard:not(.resultsDashboard) .brandText,
+.dashboard:not(.resultsDashboard) .leftPanel h2,
+.dashboard:not(.resultsDashboard) .agentRunCard h1,
+.dashboard:not(.resultsDashboard) .priorityCard strong,
+.dashboard:not(.resultsDashboard) .fieldLabel {
+  color: #eef4ff;
+}
+
+.dashboard:not(.resultsDashboard) .navLinks,
+.dashboard:not(.resultsDashboard) .muted,
+.dashboard:not(.resultsDashboard) .agentRunCard p,
+.dashboard:not(.resultsDashboard) .agentRunMeta,
+.dashboard:not(.resultsDashboard) .runInfoTile span,
+.dashboard:not(.resultsDashboard) .priorityCard small,
+.dashboard:not(.resultsDashboard) .runStatus {
+  color: #9fb3d6;
+}
+
+.dashboard:not(.resultsDashboard) .runInfoTile small {
+  color: #8fa7cf;
+}
+
+.dashboard:not(.resultsDashboard) .runInfoTile strong {
+  color: #edf4ff;
+}
+
+.dashboard:not(.resultsDashboard) .textInput {
+  color: #edf4ff;
+}
+
+.dashboard:not(.resultsDashboard) .textInput::placeholder {
+  color: #8ea4c9;
+}
+
+.dashboard:not(.resultsDashboard) .priorityCard {
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard:not(.resultsDashboard) .priorityCard:hover {
+  border-color: #5e8fd0;
+  background: #1a3050;
+}
+
+.dashboard:not(.resultsDashboard) .priorityCard.active {
+  border-color: #7fb0ff;
+  background: #234573;
+  box-shadow: 0 0 0 1px rgba(127, 176, 255, 0.35) inset;
+}
+
+.dashboard:not(.resultsDashboard) .runSection {
+  border-top-color: #27456f;
+}
+
+.dashboard:not(.resultsDashboard) .ghostBtn {
+  border-color: #486ea3;
+  background: #162843;
+  color: #e2edff;
+}
+
+.dashboard:not(.resultsDashboard) .loginBtn {
+  color: #a8bcdf;
+}
+
 .topbar {
   display: flex;
   align-items: center;
@@ -119,8 +228,7 @@ body {
 
 .loginBtn {
   background: transparent;
-  color: #475569;
-  border: 1px solid transparent;
+  color: #bdd0ee;
 }
 
 .ghostBtn {
@@ -1112,4 +1220,238 @@ body {
   .supplierMeta {
     text-align: left;
   }
+}
+
+/* Contrast pass: main page + results page (colors only) */
+.dashboard:not(.resultsDashboard) {
+  background: linear-gradient(165deg, #0e182a 0%, #091220 100%);
+  border-color: #345b8d;
+}
+
+.dashboard:not(.resultsDashboard) .topbar {
+  border-bottom-color: #355e93;
+}
+
+.dashboard:not(.resultsDashboard) .agentRunCard {
+  border-color: #3966a1;
+  background:
+    linear-gradient(180deg, rgba(19, 33, 56, 0.98), rgba(13, 25, 45, 0.98)),
+    repeating-linear-gradient(
+      to right,
+      rgba(150, 183, 236, 0.18) 0,
+      rgba(150, 183, 236, 0.18) 1px,
+      transparent 1px,
+      transparent 42px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(150, 183, 236, 0.18) 0,
+      rgba(150, 183, 236, 0.18) 1px,
+      transparent 1px,
+      transparent 42px
+    );
+}
+
+.dashboard:not(.resultsDashboard) .panel {
+  background: #12213a;
+  border-color: #3966a1;
+}
+
+.dashboard:not(.resultsDashboard) .brandText,
+.dashboard:not(.resultsDashboard) .agentRunCard h1,
+.dashboard:not(.resultsDashboard) .leftPanel h2,
+.dashboard:not(.resultsDashboard) .fieldLabel,
+.dashboard:not(.resultsDashboard) .priorityCard strong {
+  color: #f3f8ff;
+}
+
+.dashboard:not(.resultsDashboard) .navLinks,
+.dashboard:not(.resultsDashboard) .muted,
+.dashboard:not(.resultsDashboard) .agentRunCard p,
+.dashboard:not(.resultsDashboard) .agentRunMeta,
+.dashboard:not(.resultsDashboard) .priorityCard small,
+.dashboard:not(.resultsDashboard) .runStatus {
+  color: #bdd0ee;
+}
+
+.dashboard:not(.resultsDashboard) .agentRunCard p strong {
+  color: #d4e4ff;
+}
+
+.dashboard:not(.resultsDashboard) .textInput,
+.dashboard:not(.resultsDashboard) .priorityCard,
+.dashboard:not(.resultsDashboard) .runInfoTile,
+.dashboard:not(.resultsDashboard) .miniBlock {
+  background: #162b49;
+  border-color: #4878ba;
+}
+
+.dashboard:not(.resultsDashboard) .textInput,
+.dashboard:not(.resultsDashboard) .textInput::placeholder {
+  color: #d7e6ff;
+}
+
+.dashboard:not(.resultsDashboard) .priorityCard:hover {
+  border-color: #7fb2ff;
+  background: #1d3a61;
+}
+
+.dashboard:not(.resultsDashboard) .priorityCard.active {
+  border-color: #9bc2ff;
+  background: #2a4d7f;
+  box-shadow: 0 0 0 1px rgba(155, 194, 255, 0.42) inset;
+}
+
+.dashboard:not(.resultsDashboard) .runSection {
+  border-top-color: #3966a1;
+}
+
+.dashboard:not(.resultsDashboard) .ghostBtn {
+  border-color: #5c8ccd;
+  background: #193357;
+  color: #eef5ff;
+}
+
+.dashboard:not(.resultsDashboard) .loginBtn {
+  color: #bdd0ee;
+}
+
+.resultsDashboard {
+  background: linear-gradient(165deg, #0f1a2d 0%, #0a1322 100%);
+  border-color: #315681;
+  color: #d9e7ff;
+}
+
+.resultsDashboard .topbar {
+  border-bottom-color: #2f527d;
+}
+
+.resultsDashboard .brandText,
+.resultsDashboard .resultsTitle,
+.resultsDashboard .recHeader h2,
+.resultsDashboard .agentRunCard h1,
+.resultsDashboard .detailHead h3,
+.resultsDashboard .recCardTop h3 {
+  color: #f2f8ff;
+}
+
+.resultsDashboard .navLinks,
+.resultsDashboard .resultsHero p,
+.resultsDashboard .backLink,
+.resultsDashboard .recHeader p,
+.resultsDashboard .agentRunCard p,
+.resultsDashboard .agentRunMeta,
+.resultsDashboard .runInfoTile span,
+.resultsDashboard .recCardTop p,
+.resultsDashboard .recCardBottom,
+.resultsDashboard .aiRecommendationBox p {
+  color: #b7cae7;
+}
+
+.resultsDashboard .agentRunCard,
+.resultsDashboard .runInfoTile,
+.resultsDashboard .recCard,
+.resultsDashboard .detailCard,
+.resultsDashboard .runInfoTile,
+.resultsDashboard .aiRecommendationBox,
+.resultsDashboard .supplierRow {
+  background: #12233d;
+  border-color: #3a669f;
+}
+
+.resultsDashboard .runInfoTile small {
+  color: #9fb8df !important;
+}
+
+.resultsDashboard .runInfoTile strong {
+  color: #eef5ff !important;
+}
+
+.resultsDashboard .runInfoTile span {
+  color: #c9dbf7 !important;
+}
+
+.resultsDashboard .recTags span,
+.resultsDashboard .runChip,
+.resultsDashboard .badge,
+.resultsDashboard .collapseAllBtn,
+.resultsDashboard .closePopupBtn {
+  background: #1a3358;
+  border-color: #4d7dbd;
+  color: #d7e7ff;
+}
+
+.resultsDashboard .altGhost,
+.resultsDashboard .ghostBtn {
+  background: #193154;
+  border-color: #4d7dbd;
+  color: #e6f0ff;
+}
+
+.resultsDashboard .detailMetrics .recMetricTrack {
+  background: #223d63;
+}
+
+.resultsDashboard .costRow,
+.resultsDashboard .supplierRow,
+.resultsDashboard .aiRecommendationBox {
+  border-color: #365f96;
+}
+
+.resultsDashboard .runBtn {
+  border-color: #73a3ef;
+  background: linear-gradient(180deg, #3a70e6 0%, #2354c8 100%);
+}
+
+/* High-contrast text corrections for dark results view */
+.resultsDashboard .detailCard,
+.resultsDashboard .recCard,
+.resultsDashboard .agentRunCard,
+.resultsDashboard .panel {
+  color: #dce9ff;
+}
+
+.resultsDashboard .recScoreBlock span,
+.resultsDashboard .detailHead p,
+.resultsDashboard .recMetricTop span,
+.resultsDashboard .supplierRow span,
+.resultsDashboard .costRow small,
+.resultsDashboard .aiRecommendationBox small,
+.resultsDashboard .recCardTop p,
+.resultsDashboard .recCardBottom span {
+  color: #bcd0ee;
+}
+
+.resultsDashboard .recScoreBlock strong,
+.resultsDashboard .detailHead h3,
+.resultsDashboard .recMetricTop strong,
+.resultsDashboard .supplierRow strong,
+.resultsDashboard .costRow strong,
+.resultsDashboard .aiRecommendationBox p,
+.resultsDashboard .recCardTop h3 {
+  color: #f2f7ff;
+}
+
+.resultsDashboard .costRow strong span {
+  color: #c7d8f3;
+}
+
+.resultsDashboard .costRow em,
+.resultsDashboard .updatedNow {
+  color: #63d38d;
+}
+
+.resultsDashboard .recTags span {
+  color: #dce9ff;
+}
+
+.resultsDashboard .closePopupBtn,
+.resultsDashboard .collapseAllBtn {
+  background: #1f3f6d;
+  border-color: #5f90d1;
+  color: #ecf4ff;
+}
+
+.resultsDashboard .detailCard .runBtn {
+  color: #ffffff;
 }
