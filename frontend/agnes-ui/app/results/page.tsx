@@ -57,6 +57,17 @@ function scorePercent(value: number | null | undefined) {
   return `${Math.round(value * 100)}%`
 }
 
+function summarizeFallbackReason(message: string | null) {
+  if (!message) return null
+  if (message.includes('RESOURCE_EXHAUSTED') || message.includes('429')) {
+    return 'The live model hit a temporary rate limit, so fallback ranking was used.'
+  }
+  if (message.includes('GEMINI_API_KEY') || message.includes('VERTEX_PROJECT_ID')) {
+    return 'Live model credentials are not configured, so fallback ranking was used.'
+  }
+  return message
+}
+
 export default function ResultsPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -114,6 +125,13 @@ export default function ResultsPage() {
   }, [missingSelection, priority, productId, targetSku])
 
   const topSubstitutes = useMemo(() => result?.substitutes ?? [], [result])
+  const fallbackReasons = useMemo(
+    () =>
+      [result?.substitutionLlmError, result?.recommendationLlmError]
+        .map((message) => summarizeFallbackReason(message ?? null))
+        .filter((message, index, all) => Boolean(message) && all.indexOf(message) === index) as string[],
+    [result],
+  )
 
   return (
     <main className="pageShell">
@@ -203,12 +221,24 @@ export default function ResultsPage() {
           <>
             {result.usedFallback && (
               <section className="panel liveResultsPanel warningPanel">
-                <h2>Fallback Mode</h2>
+                <div className="warningPanelHeader">
+                  <span className="warningPanelIcon" aria-hidden="true">
+                    ▲
+                  </span>
+                  <h2>Fallback Mode</h2>
+                </div>
                 <p className="muted">
-                  Part of the live LLM flow was unavailable, so one or more stages used fallback ranking.
-                  {result.substitutionLlmError ? ` Substitution reason: ${result.substitutionLlmError}.` : ''}
-                  {result.recommendationLlmError ? ` Recommendation reason: ${result.recommendationLlmError}.` : ''}
+                  Part of the live LLM flow was unavailable, so the app used fallback ranking for this run.
                 </p>
+                {fallbackReasons.length > 0 && (
+                  <div className="warningReasonList">
+                    {fallbackReasons.map((reason) => (
+                      <span key={reason} className="warningReasonChip">
+                        {reason}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </section>
             )}
 
@@ -223,8 +253,13 @@ export default function ResultsPage() {
             </section>
 
             {topSubstitutes.length === 0 ? (
-              <section className="panel liveResultsPanel">
-                <h2>No Validated Substitutes</h2>
+              <section className="panel liveResultsPanel emptyStatePanel">
+                <div className="emptyStateHeader">
+                  <span className="emptyStateIcon" aria-hidden="true">
+                    ◌
+                  </span>
+                  <h2>No Validated Substitutes</h2>
+                </div>
                 <p className="muted">
                   The pipeline did not find any substitutes that passed validation strongly enough to rank.
                 </p>
