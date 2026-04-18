@@ -7,6 +7,7 @@ CONTEXT PROVIDED:
 - Target Ingredient: The ingredient we need to replace.
 - BOM (Bill of Materials) Ingredients: All other existing ingredients in our product's formula.
 - PubChem Components: The core chemical components and properties of the target ingredient and other ingredients in our product's formula. (derived via PubChem API).
+- FDC Nutritional Profile: The USDA FoodData Central nutritional facts & food categories for the target and the candidates (macro/micronutrients in precise amounts).
 - Candidate Substitutes: A list of chemically similar ingredients provided by our database clustering and their core chemical components (derived via PubChem API).
 
 EVALUATION CRITERIA:
@@ -21,6 +22,7 @@ EVALUATION CRITERIA:
 - Product Cluster: {{product_cluster}}
 - BOM Ingredients: {{bom_ingredients}}
 - PubChem Components: {{pubchem_components}}
+- FDC Nutritional Profile: {{fdc_nutritional_profile}}
 - Candidate Substitutes: {{candidate_substitutes}}
 
 ### REQUIRED OUTPUT ###

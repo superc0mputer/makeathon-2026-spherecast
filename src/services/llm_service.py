@@ -30,7 +30,15 @@ class IngredientLLMClient:
         with open(full_path, "r", encoding="utf-8") as f:
             return f.read()
 
-    def get_substitutes(self, target: str, cluster: str, bom: List[str], pubchem_components: str, candidates: List[str]) -> Dict[str, Any]:
+    def get_substitutes(
+        self, 
+        target: str, 
+        cluster: str, 
+        bom: List[str], 
+        pubchem_components: str, 
+        fdc_nutritional_profile: str, 
+        candidates: List[str]
+    ) -> Dict[str, Any]:
         """
         Injects real values into the prompt template and calls Gemini,
         asserting the output is strict JSON. Filters from the provided candidates list.
@@ -42,6 +50,7 @@ class IngredientLLMClient:
         prompt = prompt.replace("{{product_cluster}}", cluster)
         prompt = prompt.replace("{{bom_ingredients}}", ", ".join(bom))
         prompt = prompt.replace("{{pubchem_components}}", pubchem_components)
+        prompt = prompt.replace("{{fdc_nutritional_profile}}", fdc_nutritional_profile)
         prompt = prompt.replace("{{candidate_substitutes}}", ", ".join(candidates))
 
         try:

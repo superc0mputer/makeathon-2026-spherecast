@@ -15,10 +15,12 @@ import time
 import urllib.parse
 import re
 from typing import Any, Optional
+import dataclasses
 
 import requests
 
 from src.models.chemical_profile import ChemicalProfile, ResolutionStatus
+from src.services.cache_service import get_pubchem, set_pubchem
 
 PUBCHEM_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name"
 PUBCHEM_CID_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid"
@@ -256,49 +258,66 @@ def enrich_ingredient(
     Returns:
         ChemicalProfile with status set to RESOLVED, NOT_FOUND, or API_ERROR
     """
+    # Check cache first
+    cached_data = get_pubchem(ingredient_name)
+    if cached_data:
+        # Convert string back to ResolutionStatus enum
+        if "status" in cached_data and isinstance(cached_data["status"], str):
+            try:
+                cached_data["status"] = ResolutionStatus(cached_data["status"])
+            except ValueError:
+                pass
+        return ChemicalProfile(**cached_data)
+
     encoded = urllib.parse.quote(ingredient_name.strip())
     url = f"{PUBCHEM_BASE}/{encoded}/property/{PROPERTIES}/JSON"
 
     data, status_code, error = _request_json(url, rate_limit=rate_limit)
-    if error:
-        return _error_profile(ingredient_name, error)
+    
+    # helper variable to avoid repetition
+    final_profile = None
 
-    # PubChem returns 404 for unknown compounds
-    if status_code == 404:
+    if error:
+        final_profile = _error_profile(ingredient_name, error)
+    elif status_code == 404:
         detail = "Compound not found in PubChem."
         if data:
             fault = data.get("Fault", {})
             detail = fault.get("Message", detail)
-        return _not_found_profile(
+        final_profile = _not_found_profile(
             ingredient_name,
             f"{detail} This ingredient may be a mixture, extract, or proprietary blend.",
         )
-
-    if status_code != 200:
-        return _error_profile(
+    elif status_code != 200:
+        final_profile = _error_profile(
             ingredient_name,
             f"PubChem returned HTTP {status_code}.",
         )
-
-    if not data:
-        return _error_profile(ingredient_name, "Could not parse PubChem response as JSON.")
-
-    # Fault block inside a 200 response (PubChem does this sometimes)
-    if "Fault" in data:
+    elif not data:
+        final_profile = _error_profile(ingredient_name, "Could not parse PubChem response as JSON.")
+    elif "Fault" in data:
         fault = data["Fault"]
-        return _not_found_profile(
+        final_profile = _not_found_profile(
             ingredient_name,
             f"PubChem fault: {fault.get('Message', 'Unknown error')}",
         )
+    else:
+        props_list = data.get("PropertyTable", {}).get("Properties", [])
+        if not props_list:
+            final_profile = _not_found_profile(ingredient_name, "PubChem returned an empty property table.")
+        else:
+            ambiguous = len(props_list) > 1
+            profile = _build_resolved_profile(ingredient_name, props_list[0], ambiguous)
+            final_profile = _enrich_with_annotations(profile, rate_limit=rate_limit)
 
-    props_list = data.get("PropertyTable", {}).get("Properties", [])
-    if not props_list:
-        return _not_found_profile(ingredient_name, "PubChem returned an empty property table.")
+    # Save to cache
+    dict_profile = dataclasses.asdict(final_profile)
+    # Convert Enum to string for JSON serialization
+    if isinstance(dict_profile["status"], ResolutionStatus):
+        dict_profile["status"] = dict_profile["status"].value
+    set_pubchem(ingredient_name, dict_profile)
 
-    ambiguous = len(props_list) > 1
-    profile = _build_resolved_profile(ingredient_name, props_list[0], ambiguous)
-    return _enrich_with_annotations(profile, rate_limit=rate_limit)
-
+    return final_profile
 
 def enrich_pair(
         name_a: str,

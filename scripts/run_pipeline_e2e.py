@@ -18,6 +18,7 @@ from src.services.supplier_db_service import ingredient_name_from_sku
 from src.services.pubchem_service import enrich_ingredient
 from src.services.llm_service import IngredientLLMClient
 from src.services.enrichment_service import SupplyChainEnricher
+from src.services.fdc_service import fetch_fdc_profiles
 
 def main():
     print("=====================================================")
@@ -26,6 +27,7 @@ def main():
     
     # Configuration & Inputs
     api_key = os.environ.get("GEMINI_API_KEY")
+    fdc_api_key = os.environ.get("FDC_API_KEY")
     
     # Properly construct path to db.sqlite in the project root
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -59,6 +61,11 @@ def main():
     pubchem_profile = enrich_ingredient(target_name)
     pubchem_info = json.dumps(pubchem_profile.to_llm_dict(), indent=2)
     print(f"✅ PubChem Profile retrieved with status: {pubchem_profile.status}")
+    
+    print("\n[Phase 2A.5] Querying USDA FoodData Central API for Nutritional Fingerprints...")
+    fdc_profiles = fetch_fdc_profiles(target=target_name, candidates=candidate_names, api_key=fdc_api_key)
+    fdc_info = json.dumps(fdc_profiles, indent=2)
+    print("✅ USDA FDC Profiles retrieved.")
 
     print("\n[Phase 2B] Running LLM Contextual Validation...")
     
@@ -69,6 +76,7 @@ def main():
             cluster="Vitamins & Minerals",
             bom=bom_ingredients,
             pubchem_components=pubchem_info,
+            fdc_nutritional_profile=fdc_info,
             candidates=candidate_names
         )
     else:
