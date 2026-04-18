@@ -2,6 +2,30 @@
 
 # 🔄 Smart Ingredient Substitution Pipeline & UI
 > **Built for the Spherecast Challenge at the TUM.ai Makeathon 2026 🚀**
+---
+
+## 🏆 Hackathon Submission Details
+
+### 1. General Approach
+We architected a 4-phase generative pipeline that bridges **deterministic feature clustering** with **AI-powered contextual reasoning**. Recognizing that strict biochemical matching requires math, while recipe viability requires human-like intuition, we split the problem:
+*   **Discovery:** We query PubChem (for pure chemicals) and USDA FDC (for food mixtures) to build N-dimensional vectors. We compare these using Cosine Similarity alongside historical BOM dataset co-occurrences.
+*   **Validation:** We pass the mathematical matches into Google Gemini (via Vertex AI) tightly constrained by Pydantic schemas to ensure no chemical cross-reactions or flavor clashes occur inside the final recipe constraint.
+*   **Logistics Routing:** We deterministically map real-world suppliers directly to coordinates via OpenStreetMap (Nominatim) and retrieve known prices.
+*   **Decision Engine:** A final LLM pass evaluates the "Supply Chain Manager" priorities (e.g., heavily weighting price savings vs. minimizing transit distance) to select the ultimate Top 3 recommendations.
+
+### 2. What Worked Well
+*   **Hybrid Feature-Clustering:** Combining chemical properties, macronutrient profiles, and BOM usage successfully circumvented the severe "cold start" data sparsity problem for generic products (like "B Vitamins").
+*   **Strict JSON Pydantic Routing:** Demanding strictly enforced JSON schemas from Gemini eliminated pipeline crash events due to hallucinated formatting.
+*   **Read-Through SQLite Caching:** Implementing `cache_service.py` to transparently capture all PubChem, FDC, and OpenStreetMap calls fundamentally bypassed the severe API throttling and rate-limiting we initially encountered.
+
+### 3. What Did Not Work
+*   **LLM Geocoding Over-reliance:** Initially, we actively prompted the LLM to process and resolve supplier locations. This generated massive payload token costs and immediately exhausted free-tier API quotas. We fully removed LLM geocoding and reverted to pure deterministic OpenStreetMap API lookups, which proved infinitely more stable.
+*   **Insufficient BOM Context:** The initial context for the Bill of Materials (BOM) was too small, which resulted in invalid and poor clustering. We resolved this by enriching the context using additional API resources.
+
+### 4. How We Would Improve Our Submission
+*   **Enterprise Vector Database:** Replace local in-memory cosine similarity logic with an embedded Vector Database (e.g., Milvus or Pinecone) to allow for instant, massively scalable nearest-neighbor clustering.
+*   **Live SaaS Pricing Integration:** Replace our currently mocked Local API environment with live, authenticated calls to Mintec or another live commodities index.
+
 **Overview**
 This pipeline automates the process of finding viable, cost-effective, and low-risk substitute ingredients for a manufacturing process of a company. It leverages chemical databases, supplier logistics, and LLM-driven analysis to recommend the best alternatives.
 
