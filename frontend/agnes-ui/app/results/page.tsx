@@ -129,6 +129,13 @@ export default function ResultsPage() {
           </nav>
 
           <div className="actions">
+            <button
+              type="button"
+              className="ghostBtn"
+              onClick={() => window.open('/api/cluster-visualization', '_blank', 'noopener,noreferrer')}
+            >
+              View Clusters
+            </button>
             <button type="button" className="ghostBtn" onClick={() => router.push('/')}>
               Back
             </button>
