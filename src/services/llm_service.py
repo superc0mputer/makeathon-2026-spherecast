@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from google import genai
 from google.genai import types
 
+from src.models.recommendation_record import FinalDecisionResponse
+
 class SubstituteItem(BaseModel):
     substitute_name: str
     confidence_score: int
@@ -62,5 +64,48 @@ class IngredientLLMClient:
             return json.loads(raw_response.strip())
         except Exception as e:
             print(f"Error calling Gemini via genai: {e}")
+            return {"error": str(e)}
+
+    def get_top_3_recommendations(
+        self,
+        target_ingredient: str,
+        bom_ingredients: List[str],
+        company_coords: tuple[float, float],
+        preference_weights: Dict[str, str],
+        enriched_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Executes Step 8 (Phase 4): The Decision Engine.
+        Uses the Gemini model to evaluate fully enriched JSON metrics (dist, price, confidence) 
+        and strict returns the final Top 3 combinations.
+        """
+        template = self.load_prompt_template("prompts/recommendation_v1.prompt.txt")
+        
+        prompt = template.replace("{{target_ingredient}}", target_ingredient)
+        prompt = prompt.replace("{{bom_ingredients}}", ", ".join(bom_ingredients))
+        prompt = prompt.replace("{{company_coords}}", f"{company_coords[0]}, {company_coords[1]}")
+        prompt = prompt.replace("{{preference_weights}}", json.dumps(preference_weights))
+        prompt = prompt.replace("{{enriched_data}}", json.dumps(enriched_data, indent=2))
+        
+        try:
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    temperature=0.2, # Low temperature since evaluation needs rigor
+                    response_mime_type="application/json",
+                    response_schema=FinalDecisionResponse,
+                    system_instruction="You are a strict Data Scientist ranking supply chain constraints."
+                )
+            )
+            raw_response = response.text.strip()
+            if raw_response.startswith("```json"):
+                raw_response = raw_response.replace("```json", "", 1)
+                if raw_response.endswith("```"):
+                    raw_response = raw_response[:-3]
+            
+            return json.loads(raw_response.strip())
+        except Exception as e:
+            print(f"Error executing Recommendation LLM call: {e}")
             return {"error": str(e)}
 
