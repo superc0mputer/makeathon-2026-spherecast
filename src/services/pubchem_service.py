@@ -18,7 +18,7 @@ from typing import Any, Optional
 
 import requests
 
-from models import ChemicalProfile, ResolutionStatus
+from src.models.chemical_profile import ChemicalProfile, ResolutionStatus
 
 PUBCHEM_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name"
 PUBCHEM_CID_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid"
