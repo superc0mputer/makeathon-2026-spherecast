@@ -4,8 +4,8 @@ import sqlite3
 import urllib.request
 import urllib.parse
 from typing import Dict, Any, List, Optional
-from models.supplier import SupplierRecord
-from services.geolocation import NominatimGeocoder, enrich_suppliers_with_geodata
+from src.models.supplier import SupplierRecord
+from src.services.geolocation import NominatimGeocoder, enrich_suppliers_with_geodata
 
 class SupplyChainEnricher:
     def __init__(self, db_path: str = "db.sqlite", mintec_api_url: str = "http://127.0.0.1:8000/api/v1/prices"):
