@@ -24,7 +24,7 @@ def generate_mock_pricing():
         random.seed(name)
         prices[name] = {"price_per_kg": round(random.uniform(1.0, 50.0), 2)}
 
-    with open('src/data/mock_database.json', 'w') as f:
+    with open('src/data/mock_pricing_db.json', 'w') as f:
         json.dump(prices, f, indent=4)
 
 if __name__ == "__main__":

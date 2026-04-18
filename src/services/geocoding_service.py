@@ -10,7 +10,7 @@ from typing import Any, Optional, Sequence, TypedDict, Union, cast
 
 import requests
 
-from src.models.supplier import MatchConfidence, MatchMethod, SupplierRecord
+from src.models.supplier_record import MatchConfidence, MatchMethod, SupplierRecord
 
 
 logger = logging.getLogger(__name__)

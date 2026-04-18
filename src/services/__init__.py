@@ -1,5 +1,5 @@
-from .geolocation import NominatimGeocoder, enrich_suppliers_with_geodata
-from .supplier_lookup import find_suppliers_for_ingredients
+from .geocoding_service import NominatimGeocoder, enrich_suppliers_with_geodata
+from .supplier_db_service import find_suppliers_for_ingredients
 
 __all__ = [
     "NominatimGeocoder",

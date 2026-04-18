@@ -4,7 +4,7 @@ import os
 from unittest.mock import patch, MagicMock
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.services.supply_chain import SupplyChainEnricher
+from src.services.enrichment_service import SupplyChainEnricher
 
 @patch('urllib.request.urlopen')
 def test_supply_chain_enrichment(mock_urlopen):
