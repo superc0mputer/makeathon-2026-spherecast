@@ -1,18 +1,3 @@
-import { execFileSync } from 'node:child_process'
-import fs from 'node:fs'
-import path from 'node:path'
-
-import { NextRequest, NextResponse } from 'next/server'
-
-export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
-
-const repoRoot = path.resolve(process.cwd(), '..', '..')
-const dbPath = path.join(repoRoot, 'db/db.sqlite')
-const venvPython = path.join(repoRoot, '.venv', 'bin', 'python')
-const pythonBinary = fs.existsSync(venvPython) ? venvPython : 'python3'
-
-const pythonScript = `
 import json
 import math
 import os
@@ -159,20 +144,13 @@ def heuristic_reason(substitute, supplier, priority_key):
         return f"Ranked highly for sustainability because it remains substitutable ({confidence}/100 confidence) and the selected supplier is relatively close at about {distance} km."
     return f"Ranked as a strong overall option with {confidence}/100 substitutability confidence and available supplier support."
 
-def build_fallback_recommendations(substitutes, priority_key, current_supplier_names_str, target_name_str):
+def build_fallback_recommendations(substitutes, priority_key, current_supplier_names_str):
     valid_substitutes = []
     forbidden_suppliers = [s.strip().lower() for s in (current_supplier_names_str or "").split(",") if s.strip()]
-    target_norm = normalize_name(target_name_str)
 
     for item in substitutes:
         suppliers = item.get("suppliers", []) or []
-        sub_norm = normalize_name(item.get("substitute_name", ""))
-        
-        if sub_norm == target_norm:
-            valid_suppliers = [sup for sup in suppliers if sup.get("name", "").lower() not in forbidden_suppliers]
-        else:
-            valid_suppliers = suppliers
-
+        valid_suppliers = [sup for sup in suppliers if sup.get("name", "").lower() not in forbidden_suppliers]
         if valid_suppliers:
             item_copy = dict(item)
             item_copy["suppliers"] = valid_suppliers
@@ -373,7 +351,7 @@ else:
     if not recommendation_result or "error" in recommendation_result:
         if isinstance(recommendation_result, dict) and recommendation_result.get("error"):
             recommendation_error = recommendation_result["error"]
-        recommendation_result = build_fallback_recommendations(enriched_substitutes, priority, current_supplier_names, target_name)
+        recommendation_result = build_fallback_recommendations(enriched_substitutes, priority, current_supplier_names)
 
 available_substitutes = {
     normalize_name(item.get("substitute_name", "")): item
@@ -390,7 +368,7 @@ for recommendation in recommendation_result.get("top_3_recommendations", []):
 
 # If LLM didn't return correctly or we had to filter things out entirely:
 if not sanitized_recommendations and enriched_substitutes:
-    fallback_res = build_fallback_recommendations(enriched_substitutes, priority, current_supplier_names, target_name)
+    fallback_res = build_fallback_recommendations(enriched_substitutes, priority, current_supplier_names)
     recommendation_result = fallback_res
     sanitized_recommendations = fallback_res.get("top_3_recommendations", [])
 else:
@@ -424,11 +402,10 @@ for item in enriched_substitutes:
     normalized_name = normalize_name(item.get("substitute_name", ""))
     recommendation = recommendation_lookup.get(normalized_name)
     
-    # Exclude substitute entirely if its ONLY suppliers are the ones we already use (AND it is the exact same chemical)
-    if normalized_name == normalize_name(target_name):
-        item_suppliers = [s.get("name", "").lower() for s in (item.get("suppliers", []) or [])]
-        if item_suppliers and all(s in forbidden_suppliers for s in item_suppliers):
-            continue
+    # Exclude substitute entirely if its ONLY suppliers are the ones we already use
+    item_suppliers = [s.get("name", "").lower() for s in (item.get("suppliers", []) or [])]
+    if item_suppliers and all(s in forbidden_suppliers for s in item_suppliers):
+        continue
 
     resolved_substitute_cards.append({
         "name": item.get("substitute_name"),
@@ -472,49 +449,3 @@ result = {
 }
 
 print(json.dumps(result))
-`
-
-export async function GET(request: NextRequest) {
-  try {
-    const productId = request.nextUrl.searchParams.get('productId')
-    const targetSku = request.nextUrl.searchParams.get('targetSku')
-    const priority = request.nextUrl.searchParams.get('priority') ?? 'cost'
-
-    if (!productId || !targetSku) {
-      return NextResponse.json({ error: 'productId and targetSku are required.' }, { status: 400 })
-    }
-
-    const raw = execFileSync(
-      pythonBinary,
-      ['-c', pythonScript, repoRoot, dbPath, productId, targetSku, priority],
-      {
-        cwd: repoRoot,
-        encoding: 'utf-8',
-        env: process.env,
-        maxBuffer: 10 * 1024 * 1024,
-      },
-    )
-
-    const jsonLine = raw
-      .trim()
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .reverse()
-      .find((line) => line.startsWith('{') && line.endsWith('}'))
-
-    if (!jsonLine) {
-      throw new Error('Analysis script did not return JSON.')
-    }
-
-    const parsed = JSON.parse(jsonLine)
-    if (parsed.error) {
-      return NextResponse.json(parsed, { status: 500 })
-    }
-
-    return NextResponse.json(parsed)
-  } catch (error) {
-    console.error('Failed to run substitution analysis', error)
-    return NextResponse.json({ error: 'Failed to run substitution analysis.' }, { status: 500 })
-  }
-}
