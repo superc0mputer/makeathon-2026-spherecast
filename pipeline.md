@@ -11,18 +11,22 @@ This pipeline automates the process of finding viable, cost-effective, and low-r
 
 ---
 
-### Phase 1: Discovery & Chemical Profiling
-*The goal here is to understand the chemical makeup of the target ingredient and find similar product families.*
+### Phase 1: Discovery & Hybrid Feature-Based Clustering
+*The goal here is to dynamically map the target ingredient to viable substitutes using a multi-dimensional similarity model.*
 
-* **Step 1: Product Clustering**
-    Group similar products and product families to understand the broader context of how this ingredient is used.
-![alt text](image.png)
-
-* **Step 2: Chemical Component Extraction**
-    Query the **PubChem API** to break down the target ingredient into its base chemical components. 
+* **Step 1: BOM Co-occurrence Analysis**
+    Build a matrix of historical usage from the BOM dataset. This overcomes the "cold start" sparsity problem by finding statistical correlations between ingredients.
+* **Step 2: API Feature Extraction (FDC & PubChem)**
+    Extract numerical vectors from two distinct APIs:
+    * **USDA FoodData Central (FDC):** Grabs nutritional macronutrients (Energy, Protein, Fat, Carbs) to handle complex food mixtures (e.g., "MCT oil", "gelatin") that lack pure molecular formulas.
+    * **PubChem REST API:** Grabs pure chemical properties (Molecular Weight, XLogP, Charge, Salts) for precise molecular matching. 
+* **Step 3: Read-Through API Caching**
+    All API calls route through a local SQLite cache (`cache.sqlite`) to prevent rate-limiting, mitigate timeouts, and enable fast batch processing. Includes regex fallbacks to dynamically trim lengthy food-grade names if PubChem returns a 404.
+* **Step 4: Hybrid Cosine Similarity Scoring**
+    Normalize features via `MinMaxScaler` and calculate a weighted similarity matrix: `(BOM * 0.4) + (PubChem * 0.3) + (FDC * 0.3)`. Output a shortlist of statistically viable substitutes.
 
 ### Phase 2: Feasibility & Initial Filtering
-*The goal here is to use AI to ensure the chemically similar ingredients actually work in our specific recipe.*
+*The goal here is to use AI to ensure the mathematically similar ingredients actually work in our specific recipe.*
 
 * **Step 3: LLM Contextual Validation**
     Send the chemical components to an LLM. Ask: *"Can these components actually act as a substitute in this specific context?"* * **Prompt Context Provided:** The clustered similar products AND all other current ingredients in our product's BOM (to avoid negative chemical reactions or flavor profile clashes).

@@ -269,10 +269,27 @@ def enrich_ingredient(
                 pass
         return ChemicalProfile(**cached_data)
 
+    # First try exact match
     encoded = urllib.parse.quote(ingredient_name.strip())
     url = f"{PUBCHEM_BASE}/{encoded}/property/{PROPERTIES}/JSON"
 
     data, status_code, error = _request_json(url, rate_limit=rate_limit)
+
+    # Attempt to sanitize common multi-word ingredient names for better PubChem matches
+    if status_code == 404:
+        # Try a more aggressive clean up of the name for caching purposes
+        clean_name = re.sub(r'(?i)\b(powder|extract|leaf|root|organic|natural|flavor|concentrate|gel|juice|lake|membrane|peptides|syrup|blend)\b', '', ingredient_name)
+        clean_name = re.sub(r'[-\s][a-zA-Z0-9]+$', '', clean_name.strip())
+        clean_name = " ".join(clean_name.split()) # Remove multi spaces
+        
+        if clean_name and clean_name != ingredient_name.strip():
+            encoded_sanitized = urllib.parse.quote(clean_name)
+            sanitized_url = f"{PUBCHEM_BASE}/{encoded_sanitized}/property/{PROPERTIES}/JSON"
+            data2, status_code2, error2 = _request_json(sanitized_url, rate_limit=rate_limit)
+            if status_code2 == 200:
+                data = data2
+                status_code = status_code2
+                error = error2
     
     # helper variable to avoid repetition
     final_profile = None
