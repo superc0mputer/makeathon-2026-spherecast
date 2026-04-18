@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Dict
-from models.substitution.full_ingredient_profile import FullIngredientProfile
+from src.models.substitution.full_ingredient_profile import FullIngredientProfile
 
 class Phase2Context(BaseModel):
     """

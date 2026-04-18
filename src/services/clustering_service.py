@@ -28,9 +28,10 @@ from src.services.pubchem_service import enrich_ingredient
 DEFAULT_DB = "db.sqlite"
 MIN_SIMILARITY = 0.40 # Reduced threshold since we multiply features
 
-WEIGHT_BOM = 0.4
-WEIGHT_CHEM = 0.3
-WEIGHT_FDC = 0.3
+WEIGHT_BOM = 0.30
+WEIGHT_CHEM = 0.25
+WEIGHT_FDC = 0.25
+WEIGHT_TEXT = 0.20
 
 def load_data(db_path: str) -> pd.DataFrame:
     con = sqlite3.connect(db_path)
@@ -156,12 +157,34 @@ def calculate_target_substitutes(components: pd.DataFrame, target_sku: str) -> d
         fdc_sim_scores = cosine_similarity(target_fdc, fdc_norm)[0]
     else:
         fdc_sim_scores = np.zeros(len(ingredient_skus))
+        
+    import difflib
+    text_sim_scores = np.zeros(len(ingredient_skus))
+    
+    target_chem_raw_sum = np.sum(np.abs(chem_matrix[target_idx]))
+    target_fdc_raw_sum = np.sum(np.abs(fdc_matrix[target_idx]))
+    
+    target_name_normalized = names_mapped[target_idx].lower()
+
+    # Penalize "similarity by absence" and score text
+    for j in range(len(ingredient_skus)):
+        # 1. Text Similarity Score
+        seq = difflib.SequenceMatcher(None, target_name_normalized, names_mapped[j].lower())
+        text_sim_scores[j] = seq.ratio()
+        
+        # 2. Absence Penalty (if target OR candidate lacks data entirely, zero out the similarity)
+        if target_chem_raw_sum == 0.0 or np.sum(np.abs(chem_matrix[j])) == 0.0:
+            chem_sim_scores[j] = 0.0
+            
+        if target_fdc_raw_sum == 0.0 or np.sum(np.abs(fdc_matrix[j])) == 0.0:
+            fdc_sim_scores[j] = 0.0
 
     # Apply Weights
     final_hybrid_scores = (
         (bom_sim_scores * WEIGHT_BOM) + 
         (chem_sim_scores * WEIGHT_CHEM) + 
-        (fdc_sim_scores * WEIGHT_FDC)
+        (fdc_sim_scores * WEIGHT_FDC) +
+        (text_sim_scores * WEIGHT_TEXT)
     )
 
     print("      Applying Biochemical Ontology Filter (Class vs. Component)...")

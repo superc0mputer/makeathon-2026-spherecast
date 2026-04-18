@@ -16,11 +16,11 @@ class SubstituteResponse(BaseModel):
     substitutes: list[SubstituteItem]
 
 class IngredientLLMClient:
-    def __init__(self, api_key: str = None, model_name: str = "gemini-2.5-flash"):
+    def __init__(self, api_key: str = None, model_name: str = "gemini-2.5-flash", project_id: str = None, location: str = "us-central1"):
         """
         Initializes the LLM orchestrated client.
         """
-        self.client = GeminiClient(api_key=api_key, model_name=model_name)
+        self.client = GeminiClient(api_key=api_key, model_name=model_name, project_id=project_id, location=location)
 
     def load_prompt_template(self, prompt_path: str = "prompts/substitution_v1.prompt.txt") -> str:
         """Loads the version-controlled prompt template from disk."""

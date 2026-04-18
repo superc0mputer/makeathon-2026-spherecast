@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Dict, Any, Optional
-from src.models.substitution.nutritional_profile import NutritionalProfile
+from models.substitution.nutritional_profile import NutritionalProfile
 
 class FullIngredientProfile(BaseModel):
     """

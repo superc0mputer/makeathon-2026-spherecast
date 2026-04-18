@@ -6,8 +6,12 @@ from typing import Type
 
 class GeminiClient:
     """Client for Google Gemini LLM API"""
-    def __init__(self, api_key: str = None, model_name: str = "gemini-2.5-flash"):
-        self.client = genai.Client(api_key=api_key)
+    def __init__(self, api_key: str = None, model_name: str = "gemini-2.5-flash", project_id: str = None, location: str = "us-central1"):
+        if project_id:
+            # We use Vertex AI backend instead of free-tier AI Studio
+            self.client = genai.Client(vertexai=True, project=project_id, location=location)
+        else:
+            self.client = genai.Client(api_key=api_key)
         self.model_name = model_name
 
     def generate_json_structured_content(

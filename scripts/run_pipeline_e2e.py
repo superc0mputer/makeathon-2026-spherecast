@@ -19,9 +19,9 @@ from src.services.pubchem_service import enrich_ingredient
 from src.services.llm_service import IngredientLLMClient
 from src.services.mintec_service import SupplyChainEnricher
 from src.services.fdc_service import fetch_fdc_profiles
-from models.substitution.nutritional_profile import NutritionalProfile
+from src.models.substitution.nutritional_profile import NutritionalProfile
 from src.models.phase2_context import Phase2Context
-from models.substitution.full_ingredient_profile import FullIngredientProfile
+from src.models.substitution.full_ingredient_profile import FullIngredientProfile
 
 def main():
     print("=====================================================")
@@ -30,6 +30,8 @@ def main():
     
     # Configuration & Inputs
     api_key = os.environ.get("GEMINI_API_KEY")
+    vertex_project = os.environ.get("VERTEX_PROJECT_ID")
+    vertex_location = os.environ.get("VERTEX_LOCATION", "us-central1")
     fdc_api_key = os.environ.get("FDC_API_KEY")
     
     # Properly construct path to db.sqlite in the project root
@@ -98,14 +100,14 @@ def main():
 
     print("\n[Phase 2B] Running LLM Contextual Validation with Cross-Reactions...")
     
-    if api_key:
-        llm_client = IngredientLLMClient(api_key=api_key)
+    if api_key or vertex_project:
+        llm_client = IngredientLLMClient(api_key=api_key, project_id=vertex_project, location=vertex_location)
         llm_shortlist = llm_client.get_substitutes(phase2_context)
     else:
-        llm_shortlist = {"error": "GEMINI_API_KEY environment variable not set. Using mock LLM client."}
+        llm_shortlist = {"error": "GEMINI_API_KEY or VERTEX_PROJECT_ID environment variable not set. Using mock LLM client."}
     
     if "error" in llm_shortlist:
-        print(f"⚠️ LLM Call failed (Likely missing GEMINI_API_KEY): {llm_shortlist['error']}")
+        print(f"⚠️ LLM Call failed (Check GEMINI_API_KEY / Vertex Quotas): {llm_shortlist['error']}")
         print("⚠️ Injecting Mock LLM Shortlist to keep pipeline advancing...")
         llm_shortlist = {
             "substitutes": [
@@ -141,7 +143,7 @@ def main():
     # ---------------------------------------------------------
     print("\n[Phase 4] LLM Multi-Criteria Decision Engine (Evaluating Price/Distance/Chemicals)...")
     
-    if api_key:
+    if api_key or vertex_project:
         final_recs = llm_client.get_top_3_recommendations(
             target_ingredient=target_name,
             bom_ingredients=bom_ingredients,
@@ -150,7 +152,7 @@ def main():
             enriched_data=enriched_data
         )
     else:
-        final_recs = {"error": "GEMINI_API_KEY environment variable not set. Cannot run final LLM step."}
+        final_recs = {"error": "GEMINI_API_KEY or VERTEX_PROJECT_ID environment variable not set. Cannot run final LLM step."}
     
     if "error" in final_recs:
         print(f"⚠️ Final Engine LLM Call failed: {final_recs['error']}")

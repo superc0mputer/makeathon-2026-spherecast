@@ -7,7 +7,7 @@ import re
 from typing import Any, Optional
 import dataclasses
 
-from models.substitution.chemical_profile import ChemicalProfile, ResolutionStatus
+from src.models.substitution.chemical_profile import ChemicalProfile, ResolutionStatus
 from src.services.cache_service import get_pubchem, set_pubchem
 from src.api_clients.pubchem_client import PubChemClient
 
