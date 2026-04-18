@@ -5,7 +5,6 @@ IMPORTANT: You must ONLY evaluate and select from the "Candidate Substitutes" pr
 
 CONTEXT PROVIDED:
 - Target Ingredient: The ingredient we need to replace.
-- Optimization Priority: The business objective that should break ties between viable substitutes.
 - BOM (Bill of Materials) Ingredients: All other existing ingredients in our product's formula.
 - Target Profile: The exact chemical (PubChem) and nutritional (FDC) footprint of the target ingredient to be replaced.
 - Candidate Profiles: The chemical (PubChem) and nutritional (FDC) footprints of the substitute candidates.
@@ -18,17 +17,11 @@ EVALUATION CRITERIA:
 4. Strict Filtering: If a candidate from the list is NOT a viable substitute (due to chemical mismatch or a bad interaction with the BOM), you must EXCLUDE it from the final list. Only return the candidates that actually work. 
 5. Class vs. Component Constraint: Do not suggest an isolated component (e.g., Vitamin B1) as a substitute for a complex or blend (e.g., B-Vitamin Complex).
 6. Empty Results: If NONE of the candidates are viable, return an empty array for "substitutes". Do not force a match.
-7. Business Priority Tie-Breaking: If multiple candidates are viable, rank and phrase your reasoning according to the Optimization Priority. 
-   - If the priority is Reduce Cost, prefer substitutes that are cheaper or simpler to source at scale.
-   - If the priority is Reduce Supplier Count, prefer substitutes that are more common, standardized, or easier to consolidate across suppliers.
-   - If the priority is Reduce Risk / Improve Reliability, prefer substitutes with lower formulation risk, lower interaction risk, and more predictable use.
-   - If the priority is Improve Sustainability, prefer substitutes that likely reduce environmental impact, waste, or unnecessary processing.
-   This priority should only influence ranking among viable candidates. It must never override chemical or BOM incompatibility constraints.
+7. Rank only by substitutability and whole-formula fitness. Business priorities such as cost, supplier consolidation, reliability, or sustainability are handled in a later recommendation phase and must not affect which candidates are considered chemically viable here.
 
 ### INPUTS ###
 - Target Ingredient: {{target_ingredient}}
 - Product Cluster: {{product_cluster}}
-- Optimization Priority: {{optimization_priority}}
 - Target Profile: {{target_profile}}
 - Candidate Profiles: {{candidate_profiles}}
 - BOM Profiles: {{bom_profiles}}

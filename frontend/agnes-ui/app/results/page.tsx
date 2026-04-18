@@ -3,18 +3,22 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-type ClusterCandidate = {
-  sku: string
-  name: string
-  hybridSimilarity: number
-}
-
 type Substitute = {
   name: string
   sku: string | null
   confidenceScore: number
   reasoning: string
   hybridSimilarity: number | null
+  pricePerKg?: number | null
+  supplierCount?: number
+  rank: number
+  rankingReasoning?: string | null
+  recommendedSupplier?: {
+    id: number
+    name: string
+    pricePerKg: number
+    distanceKm: number
+  } | null
 }
 
 type AnalysisResult = {
@@ -29,11 +33,12 @@ type AnalysisResult = {
     name: string
   }
   priority: string
+  priorityLabel: string
   bomIngredientNames: string[]
-  clusterCandidates: ClusterCandidate[]
   substitutes: Substitute[]
   usedFallback: boolean
-  llmError: string | null
+  substitutionLlmError: string | null
+  recommendationLlmError: string | null
 }
 
 const priorityLabels: Record<string, string> = {
@@ -153,7 +158,7 @@ export default function ResultsPage() {
           </h1>
           <p>
             This run combines hybrid substitute discovery, profile enrichment, and contextual LLM
-            validation for the selected finished good.
+            validation and then sorts the viable substitutes based on the selected business priority.
           </p>
 
           <div className="runInfoGrid">
@@ -180,16 +185,6 @@ export default function ResultsPage() {
           </div>
         </section>
 
-        {loading && (
-          <section className="panel liveResultsPanel">
-            <h2>Running Analysis</h2>
-            <p className="muted">
-              Agnes is computing hybrid similarity candidates, building ingredient profiles, and asking the
-              LLM to validate which substitutes work in this BOM.
-            </p>
-          </section>
-        )}
-
         {missingSelection && (
           <section className="panel liveResultsPanel errorPanel">
             <h2>Missing Selection</h2>
@@ -210,8 +205,9 @@ export default function ResultsPage() {
               <section className="panel liveResultsPanel warningPanel">
                 <h2>Fallback Mode</h2>
                 <p className="muted">
-                  The live LLM response was unavailable, so the shortlist is currently based on hybrid
-                  similarity candidates. {result.llmError ? `Reason: ${result.llmError}` : ''}
+                  Part of the live LLM flow was unavailable, so one or more stages used fallback ranking.
+                  {result.substitutionLlmError ? ` Substitution reason: ${result.substitutionLlmError}.` : ''}
+                  {result.recommendationLlmError ? ` Recommendation reason: ${result.recommendationLlmError}.` : ''}
                 </p>
               </section>
             )}
@@ -219,7 +215,7 @@ export default function ResultsPage() {
             <section className="recHeader">
               <div>
                 <h2>Validated Substitutes</h2>
-                <p>Shortlisted after hybrid clustering and contextual LLM validation</p>
+                <p>Sorted by the backend using the selected business priority</p>
               </div>
               <div className="recHeaderActions">
                 <span className="updatedNow">● {topSubstitutes.length} substitutes returned</span>
@@ -228,10 +224,9 @@ export default function ResultsPage() {
 
             {topSubstitutes.length === 0 ? (
               <section className="panel liveResultsPanel">
-                <h2>No Viable Substitutes</h2>
+                <h2>No Validated Substitutes</h2>
                 <p className="muted">
-                  The pipeline did not find any substitutes that passed the current similarity threshold and
-                  contextual validation for this BOM.
+                  The pipeline did not find any substitutes that passed validation strongly enough to rank.
                 </p>
               </section>
             ) : (
@@ -240,7 +235,7 @@ export default function ResultsPage() {
                   <article key={`${substitute.name}-${index}`} className="substituteResultCard">
                     <div className="substituteCardTop">
                       <div>
-                        <small>Option {index + 1}</small>
+                        <small>{substitute.rank ? `Rank ${substitute.rank}` : `Option ${index + 1}`}</small>
                         <h3>{substitute.name}</h3>
                       </div>
                       <div className="substituteConfidence">
@@ -255,17 +250,26 @@ export default function ResultsPage() {
                         <strong>{scorePercent(substitute.hybridSimilarity)}</strong>
                       </div>
                       <div className="substituteMetricChip">
-                        <span>SKU</span>
-                        <strong>{substitute.sku ?? 'Not resolved'}</strong>
+                        <span>Price / kg</span>
+                        <strong>
+                          {substitute.pricePerKg != null ? substitute.pricePerKg.toFixed(2) : 'n/a'}
+                        </strong>
+                      </div>
+                      <div className="substituteMetricChip">
+                        <span>Supplier Options</span>
+                        <strong>
+                          {substitute.supplierCount ?? 0}
+                        </strong>
                       </div>
                     </div>
 
-                    <p className="substituteReasoning">{substitute.reasoning}</p>
+                    <p className="substituteReasoning">
+                      {substitute.rankingReasoning ?? substitute.reasoning}
+                    </p>
                   </article>
                 ))}
               </section>
             )}
-
           </>
         )}
       </section>

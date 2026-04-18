@@ -40,7 +40,6 @@ class IngredientLLMClient:
         # Inject context variables
         prompt = template.replace("{{target_ingredient}}", context.target_ingredient)
         prompt = prompt.replace("{{product_cluster}}", context.product_cluster)
-        prompt = prompt.replace("{{optimization_priority}}", context.optimization_priority)
         prompt = prompt.replace("{{target_profile}}", context.target_profile.model_dump_json(indent=2))
         
         # model_dump_json doesn't exist on Dict, so we dump mapping
@@ -77,6 +76,7 @@ class IngredientLLMClient:
         prompt = prompt.replace("{{company_coords}}", f"{context.company_coords[0]}, {context.company_coords[1]}")
         prompt = prompt.replace("{{bom_ingredients}}", json.dumps(context.bom_ingredients))
         prompt = prompt.replace("{{preference_weights}}", json.dumps(context.preference_weights))
+        prompt = prompt.replace("{{optimization_priority}}", context.preference_weights.get("selected_priority", "Reduce Cost"))
         
         # Serialize the validated Pydantic substitutes directly into the prompt
         sub_dump = [sub.model_dump() for sub in context.candidates]
