@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 type Substitute = {
@@ -68,7 +68,8 @@ function summarizeFallbackReason(message: string | null) {
   return message
 }
 
-export default function ResultsPage() {
+// 1. Rename your original component to ResultsContent (or similar)
+function ResultsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const productId = searchParams.get('productId')
@@ -91,8 +92,8 @@ export default function ResultsPage() {
       try {
         setLoading(true)
         const params = new URLSearchParams({
-          productId,
-          targetSku,
+          productId: productId ?? '',
+          targetSku: targetSku ?? '',
           priority,
         })
         const response = await fetch(`/api/analyze?${params.toString()}`, { cache: 'no-store' })
@@ -126,15 +127,14 @@ export default function ResultsPage() {
 
   const topSubstitutes = useMemo(() => result?.substitutes ?? [], [result])
   const fallbackReasons = useMemo(
-    () =>
-      [result?.substitutionLlmError, result?.recommendationLlmError]
-        .map((message) => summarizeFallbackReason(message ?? null))
-        .filter((message, index, all) => Boolean(message) && all.indexOf(message) === index) as string[],
-    [result],
+      () =>
+          [result?.substitutionLlmError, result?.recommendationLlmError]
+              .map((message) => summarizeFallbackReason(message ?? null))
+              .filter((message, index, all) => Boolean(message) && all.indexOf(message) === index) as string[],
+      [result],
   )
 
   return (
-    <main className="pageShell">
       <section className="dashboard resultsDashboard">
         <header className="topbar">
           <div className="brandWrap">
@@ -153,9 +153,9 @@ export default function ResultsPage() {
 
           <div className="actions">
             <button
-              type="button"
-              className="ghostBtn"
-              onClick={() => window.open('/api/cluster-visualization', '_blank', 'noopener,noreferrer')}
+                type="button"
+                className="ghostBtn"
+                onClick={() => window.open('/api/cluster-visualization', '_blank', 'noopener,noreferrer')}
             >
               View Clusters
             </button>
@@ -204,110 +204,120 @@ export default function ResultsPage() {
         </section>
 
         {missingSelection && (
-          <section className="panel liveResultsPanel errorPanel">
-            <h2>Missing Selection</h2>
-            <p className="muted">Go back and choose a product plus an ingredient before running the analysis.</p>
-          </section>
+            <section className="panel liveResultsPanel errorPanel">
+              <h2>Missing Selection</h2>
+              <p className="muted">Go back and choose a product plus an ingredient before running the analysis.</p>
+            </section>
         )}
 
         {error && !loading && !missingSelection && (
-          <section className="panel liveResultsPanel errorPanel">
-            <h2>Analysis Failed</h2>
-            <p className="muted">{error}</p>
-          </section>
+            <section className="panel liveResultsPanel errorPanel">
+              <h2>Analysis Failed</h2>
+              <p className="muted">{error}</p>
+            </section>
         )}
 
         {!loading && result && !missingSelection && (
-          <>
-            {result.usedFallback && (
-              <section className="panel liveResultsPanel warningPanel">
-                <div className="warningPanelHeader">
-                  <span className="warningPanelIcon" aria-hidden="true">
-                    ▲
-                  </span>
-                  <h2>Fallback Mode</h2>
-                </div>
-                <p className="muted">
-                  Part of the live LLM flow was unavailable, so the app used fallback ranking for this run.
-                </p>
-                {fallbackReasons.length > 0 && (
-                  <div className="warningReasonList">
-                    {fallbackReasons.map((reason) => (
-                      <span key={reason} className="warningReasonChip">
-                        {reason}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </section>
-            )}
-
-            <section className="recHeader">
-              <div>
-                <h2>Validated Substitutes</h2>
-                <p>Sorted by the backend using the selected business priority</p>
-              </div>
-              <div className="recHeaderActions">
-                <span className="updatedNow">● {topSubstitutes.length} substitutes returned</span>
-              </div>
-            </section>
-
-            {topSubstitutes.length === 0 ? (
-              <section className="panel liveResultsPanel emptyStatePanel">
-                <div className="emptyStateHeader">
-                  <span className="emptyStateIcon" aria-hidden="true">
-                    ◌
-                  </span>
-                  <h2>No Validated Substitutes</h2>
-                </div>
-                <p className="muted">
-                  The pipeline did not find any substitutes that passed validation strongly enough to rank.
-                </p>
-              </section>
-            ) : (
-              <section className="substituteResultsGrid">
-                {topSubstitutes.map((substitute, index) => (
-                  <article key={`${substitute.name}-${index}`} className="substituteResultCard">
-                    <div className="substituteCardTop">
-                      <div>
-                        <small>{substitute.rank ? `Rank ${substitute.rank}` : `Option ${index + 1}`}</small>
-                        <h3>{substitute.name}</h3>
-                      </div>
-                      <div className="substituteConfidence">
-                        <span>Confidence</span>
-                        <strong>{substitute.confidenceScore}</strong>
-                      </div>
+            <>
+              {result.usedFallback && (
+                  <section className="panel liveResultsPanel warningPanel">
+                    <div className="warningPanelHeader">
+                <span className="warningPanelIcon" aria-hidden="true">
+                  ▲
+                </span>
+                      <h2>Fallback Mode</h2>
                     </div>
-
-                    <div className="substituteMetricRow">
-                      <div className="substituteMetricChip">
-                        <span>Hybrid Similarity</span>
-                        <strong>{scorePercent(substitute.hybridSimilarity)}</strong>
-                      </div>
-                      <div className="substituteMetricChip">
-                        <span>Price / kg</span>
-                        <strong>
-                          {substitute.pricePerKg != null ? substitute.pricePerKg.toFixed(2) : 'n/a'}
-                        </strong>
-                      </div>
-                      <div className="substituteMetricChip">
-                        <span>Supplier Options</span>
-                        <strong>
-                          {substitute.supplierCount ?? 0}
-                        </strong>
-                      </div>
-                    </div>
-
-                    <p className="substituteReasoning">
-                      {substitute.rankingReasoning ?? substitute.reasoning}
+                    <p className="muted">
+                      Part of the live LLM flow was unavailable, so the app used fallback ranking for this run.
                     </p>
-                  </article>
-                ))}
+                    {fallbackReasons.length > 0 && (
+                        <div className="warningReasonList">
+                          {fallbackReasons.map((reason) => (
+                              <span key={reason} className="warningReasonChip">
+                      {reason}
+                    </span>
+                          ))}
+                        </div>
+                    )}
+                  </section>
+              )}
+
+              <section className="recHeader">
+                <div>
+                  <h2>Validated Substitutes</h2>
+                  <p>Sorted by the backend using the selected business priority</p>
+                </div>
+                <div className="recHeaderActions">
+                  <span className="updatedNow">● {topSubstitutes.length} substitutes returned</span>
+                </div>
               </section>
-            )}
-          </>
+
+              {topSubstitutes.length === 0 ? (
+                  <section className="panel liveResultsPanel emptyStatePanel">
+                    <div className="emptyStateHeader">
+                <span className="emptyStateIcon" aria-hidden="true">
+                  ◌
+                </span>
+                      <h2>No Validated Substitutes</h2>
+                    </div>
+                    <p className="muted">
+                      The pipeline did not find any substitutes that passed validation strongly enough to rank.
+                    </p>
+                  </section>
+              ) : (
+                  <section className="substituteResultsGrid">
+                    {topSubstitutes.map((substitute, index) => (
+                        <article key={`${substitute.name}-${index}`} className="substituteResultCard">
+                          <div className="substituteCardTop">
+                            <div>
+                              <small>{substitute.rank ? `Rank ${substitute.rank}` : `Option ${index + 1}`}</small>
+                              <h3>{substitute.name}</h3>
+                            </div>
+                            <div className="substituteConfidence">
+                              <span>Confidence</span>
+                              <strong>{substitute.confidenceScore}</strong>
+                            </div>
+                          </div>
+
+                          <div className="substituteMetricRow">
+                            <div className="substituteMetricChip">
+                              <span>Hybrid Similarity</span>
+                              <strong>{scorePercent(substitute.hybridSimilarity)}</strong>
+                            </div>
+                            <div className="substituteMetricChip">
+                              <span>Price / kg</span>
+                              <strong>
+                                {substitute.pricePerKg != null ? substitute.pricePerKg.toFixed(2) : 'n/a'}
+                              </strong>
+                            </div>
+                            <div className="substituteMetricChip">
+                              <span>Supplier Options</span>
+                              <strong>
+                                {substitute.supplierCount ?? 0}
+                              </strong>
+                            </div>
+                          </div>
+
+                          <p className="substituteReasoning">
+                            {substitute.rankingReasoning ?? substitute.reasoning}
+                          </p>
+                        </article>
+                    ))}
+                  </section>
+              )}
+            </>
         )}
       </section>
-    </main>
+  )
+}
+
+// 2. Create a new default export that wraps the content in Suspense
+export default function ResultsPage() {
+  return (
+      <main className="pageShell">
+        <Suspense fallback={<div>Loading interface...</div>}>
+          <ResultsContent />
+        </Suspense>
+      </main>
   )
 }
