@@ -41,7 +41,7 @@ This pipeline automates the process of finding viable, cost-effective, and low-r
 * **Step 6: Supplier Matching**
     Query our internal database to find all known suppliers that carry these shortlisted substitutes.
 * **Step 7: Geolocation Routing**
-    Ping the **Google Places API** to get the exact coordinates/locations of these suppliers to calculate shipping distances.
+    Ping the **OpenStreetMap** to get the exact coordinates/locations of these suppliers to calculate shipping distances.
 
 ### Phase 4: The Decision Engine
 *The final LLM evaluation that acts as a supply chain manager, weighing all factors to make a final business decision.*

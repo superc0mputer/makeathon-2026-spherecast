@@ -1,5 +1,5 @@
-from .chemical_profile import ChemicalProfile, ResolutionStatus
-from .supplier_record import MatchConfidence, MatchMethod, SupplierRecord, SupplierRecordDict
+from src.models.chemical_profile import ChemicalProfile, ResolutionStatus
+from src.models.supplier_record import MatchConfidence, MatchMethod, SupplierRecord, SupplierRecordDict
 
 __all__ = [
     "ChemicalProfile",
