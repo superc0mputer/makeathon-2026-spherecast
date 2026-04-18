@@ -77,10 +77,14 @@ Copy the example template to create your `.env` file:
 cp .env.example .env
 ```
 
-Then, open `.env` and add your keys:
+Then, open `.env` and add your keys. You can choose one of two options for Gemini:
 ```env
-# Google Gemini LLM API Key
+# Option A: Standard Google Gemini API Key
 GEMINI_API_KEY=your_gemini_api_key_here
+
+# Option B: Google Cloud Vertex AI (Make sure to run `gcloud auth` locally!)
+# VERTEX_PROJECT_ID=your_gcp_project_id_here
+# VERTEX_LOCATION=us-central1
 
 # USDA FoodData Central API Key (Optional)
 FDC_API_KEY=your_fdc_api_key_here
