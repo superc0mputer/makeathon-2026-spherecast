@@ -46,6 +46,12 @@ def test_supply_chain_enrichment(mock_urlopen):
     assert pea_protein["price_per_kg"] is not None # Price fetched from mock_database
     assert len(pea_protein["suppliers"]) >= 1      # Suppliers fetched securely from SQLite
     
+    # Test Geolocation integration from Teammate's Step 7 code
+    first_supplier = pea_protein["suppliers"][0]
+    assert "distance_km" in first_supplier 
+    assert "lat" in first_supplier
+    assert "lng" in first_supplier
+
     soy_protein = subs[1]
     assert soy_protein["substitute_name"] == "Cellulose"
     assert soy_protein["price_per_kg"] is not None

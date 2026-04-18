@@ -3,15 +3,18 @@ import os
 import sqlite3
 import urllib.request
 import urllib.parse
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
+from models.supplier import SupplierRecord
+from services.geolocation import NominatimGeocoder, enrich_suppliers_with_geodata
 
 class SupplyChainEnricher:
     def __init__(self, db_path: str = "db.sqlite", mintec_api_url: str = "http://127.0.0.1:8000/api/v1/prices"):
         base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         self.db_path = os.path.join(base_path, db_path)
         self.mintec_api_url = mintec_api_url
+        self.geocoder = NominatimGeocoder()
 
-    def _get_suppliers_for_ingredient(self, ingredient_name: str) -> List[Dict[str, str]]:
+    def _get_suppliers_for_ingredient(self, ingredient_name: str) -> List[Dict[str, Any]]:
         """
         Queries the actual db.sqlite database to find suppliers for the ingredient.
         It searches the Product SKU for a match, then joins with Supplier_Product and Supplier.
@@ -26,7 +29,7 @@ class SupplyChainEnricher:
             
             # Find products matching the name, and their corresponding suppliers
             query = """
-                SELECT DISTINCT s.Name as supplier_name
+                SELECT DISTINCT s.Id as id, s.Name as supplier_name
                 FROM Product p
                 JOIN Supplier_Product sp ON p.Id = sp.ProductId
                 JOIN Supplier s ON sp.SupplierId = s.Id
@@ -37,7 +40,7 @@ class SupplyChainEnricher:
             rows = cursor.fetchall()
             conn.close()
             
-            return [{"name": row["supplier_name"], "location": "Unknown (Not in DB)", "lead_time_days": 14} for row in rows]
+            return [{"supplier_id": row["id"], "name": row["supplier_name"]} for row in rows]
         except Exception as e:
             print(f"Error querying db.sqlite: {e}")
             return []
@@ -61,10 +64,11 @@ class SupplyChainEnricher:
             
         return None
 
-    def enrich_substitutes(self, llm_response: Dict[str, Any]) -> Dict[str, Any]:
+    def enrich_substitutes(self, llm_response: Dict[str, Any], company_coords: tuple[float, float] = (48.1351, 11.5820)) -> Dict[str, Any]:
         """
         Takes the LLM JSON response and enriches each substitute with
-        real Suppliers from db.sqlite and HTTP requested mocked pricing.
+        real Suppliers from db.sqlite, HTTP requested mocked pricing, 
+        and geolocated routing distances via Nominatim.
         """
         enriched_results = []
         
@@ -74,7 +78,29 @@ class SupplyChainEnricher:
             name = substitute.get("substitute_name")
             
             # 1. Get real suppliers from db.sqlite
-            real_suppliers = self._get_suppliers_for_ingredient(name)
+            real_suppliers_raw = self._get_suppliers_for_ingredient(name)
+            real_suppliers = []
+            
+            if real_suppliers_raw:
+                supplier_records = []
+                for s in real_suppliers_raw:
+                    supplier_records.append(
+                        SupplierRecord(
+                            supplier_id=s["supplier_id"],
+                            name=s["name"],
+                            stocked_ingredients=[name]
+                        )
+                    )
+                
+                # Use teammate's function to enrich with geolocation routing API!
+                supplier_records = enrich_suppliers_with_geodata(
+                    suppliers=supplier_records,
+                    company_location=company_coords,
+                    geocoder=self.geocoder
+                )
+                
+                # Convert back to dict for generic JSON pipeline
+                real_suppliers = [r.to_dict() for r in supplier_records]
             
             # 2. Add pricing via the Mintec Mock REST API
             price = self._fetch_price_from_mintec(name)
