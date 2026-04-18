@@ -9,6 +9,7 @@ class BiochemicalContext(BaseModel):
     """
     target_ingredient: str
     product_cluster: str
+    optimization_priority: str
     target_profile: FullIngredientProfile
     bom_profiles: Dict[str, FullIngredientProfile] = Field(default_factory=dict)
     candidate_profiles: Dict[str, FullIngredientProfile] = Field(default_factory=dict)

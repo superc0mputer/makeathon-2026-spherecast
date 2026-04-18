@@ -40,6 +40,7 @@ class IngredientLLMClient:
         # Inject context variables
         prompt = template.replace("{{target_ingredient}}", context.target_ingredient)
         prompt = prompt.replace("{{product_cluster}}", context.product_cluster)
+        prompt = prompt.replace("{{optimization_priority}}", context.optimization_priority)
         prompt = prompt.replace("{{target_profile}}", context.target_profile.model_dump_json(indent=2))
         
         # model_dump_json doesn't exist on Dict, so we dump mapping
@@ -92,4 +93,3 @@ class IngredientLLMClient:
         except Exception as e:
             print(f"Error executing Recommendation LLM call: {e}")
             return {"error": str(e)}
-
